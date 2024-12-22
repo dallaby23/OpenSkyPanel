@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced Settings</title>
+  <style>
+    /* Basic Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Form Styling */
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="number"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .form-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 8px;
+    }
+
+    /* Status Message */
+    #status {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #0066cc;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .form-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>EFIS Settings</h1>
+
+  <div id="status">Connecting to server...</div>
+
+  <div class="form-container">
+    <form id="settingsForm">
+      <!-- WiFi Configuration -->
+      <div class="form-group">
+        <label for="SSID">WiFi SSID</label>
+        <input type="text" id="SSID" placeholder="Enter WiFi SSID">
+      </div>
+      <div class="form-group">
+        <label for="Password">WiFi Password</label>
+        <input type="password" id="Password" placeholder="Enter WiFi Password">
+      </div>
+      <div class="form-group">
+        <label for="StaticIP">Static IP</label>
+        <input type="text" id="StaticIP" placeholder="Enter Static IP">
+      </div>
+      <div class="form-group">
+        <label for="Gateway">Gateway</label>
+        <input type="text" id="Gateway" placeholder="Enter Gateway">
+      </div>
+      <div class="form-group">
+        <label for="Subnet">Subnet</label>
+        <input type="text" id="Subnet" placeholder="Enter Subnet">
+      </div>
+
+      <!-- EFIS Variables -->
+      <div class="form-group">
+        <label for="efisFreq">EFIS Frequency</label>
+        <input type="number" id="efisFreq" placeholder="Enter EFIS Frequency">
+      </div>
+      <div class="form-group">
+        <label for="imuFreq">IMU Frequency</label>
+        <input type="number" id="imuFreq" placeholder="Enter IMU Frequency">
+      </div>
+
+      <!-- EIS Variables -->
+      <div class="form-group">
+        <label for="eisFreq">EIS Frequency</label>
+        <input type="number" id="eisFreq" placeholder="Enter EIS Frequency">
+      </div>
+
+      <!-- VS Variables -->
+      <div class="form-group">
+        <label for="apHeadingKp">AP Heading Kp</label>
+        <input type="number" id="apHeadingKp" placeholder="Enter AP Heading Kp" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="apHeadingKd">AP Heading Kd</label>
+        <input type="number" id="apHeadingKd" placeholder="Enter AP Heading Kd" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="apAltitudeKp">AP Altitude Kp</label>
+        <input type="number" id="apAltitudeKp" placeholder="Enter AP Altitude Kp" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="apAltitudeKd">AP Altitude Kd</label>
+        <input type="number" id="apAltitudeKd" placeholder="Enter AP Altitude Kd" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="maxPitch">Max Pitch</label>
+        <input type="number" id="maxPitch" placeholder="Enter Max Pitch" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="maxRoll">Max Roll</label>
+        <input type="number" id="maxRoll" placeholder="Enter Max Roll" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="maxVertical">Max Vertical</label>
+        <input type="number" id="maxVertical" placeholder="Enter Max Vertical" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="servoMin">Servo Min</label>
+        <input type="number" id="servoMin" placeholder="Enter Servo Min">
+      </div>
+      <div class="form-group">
+        <label for="servoMax">Servo Max</label>
+        <input type="number" id="servoMax" placeholder="Enter Servo Max">
+      </div>
+	  <div class="form-group">
+        <label for="trimMin">Trim Min</label>
+        <input type="number" id="trimMin" placeholder="Enter Trim Min">
+      </div>
+      <div class="form-group">
+        <label for="trimMax">Trim Max</label>
+        <input type="number" id="trimMax" placeholder="Enter Trim Max">
+      </div>
+      <div class="form-group">
+        <label for="servoFreq">Servo Frequency</label>
+        <input type="number" id="servoFreq" placeholder="Enter Servo Frequency">
+      </div>
+      <div class="form-group">
+        <label for="apServoAdjustmentRate">AP Servo Adjustment Rate</label>
+        <input type="number" id="apServoAdjustmentRate" placeholder="Enter AP Servo Adjustment Rate" step="0.01">
+      </div>
+      <div class="form-group">
+	  <div class="form-group">
+		 <label for="scPitchRoll">Use Stratux Pitch and Roll Data</label>
+		 <input type="checkbox" id="scPitchRoll" name="scPitchRoll">
+	  </div>
+	  <div class="form-group">
+		 <label for="scHeading">Use Stratux Heading Data</label>
+		 <input type="checkbox" id="scHeading" name="scHeading">
+	  </div>
+	  <div class="form-group">
+		 <label for="scSlip">Use Stratux Slip Data</label>
+		 <input type="checkbox" id="scSlip" name="scSlip">
+	  </div>
+      <div class="form-group">
+        <label for="debugFreq">Debug Frequency</label>
+        <input type="number" id="debugFreq" placeholder="Enter Debug Frequency">
+      </div>
+	  <button type="button" id="saveButton" style="margin-top: 20px; padding: 10px; font-size: 16px;">
+		Save Settings
+	  </button>
+    </form>
+  </div>
+
+  <!-- Embedded JavaScript -->
+  <script>
+	  document.addEventListener('DOMContentLoaded', () => {
+	  initializeWebSocket();
+	  document.getElementById('saveButton').addEventListener('click', saveAllSettings);
+	});
+
+	function initializeWebSocket() {
+	  const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+	  const host = window.location.hostname;
+	  const port = window.location.port ? `:${window.location.port}` : '';
+	  const wsPath = '/ws';
+	  const gateway = `${protocol}${host}${port}${wsPath}`;
+
+	  console.log(`Connecting to WebSocket at ${gateway}`);
+	  const websocket = new WebSocket(gateway);
+
+	  websocket.onopen = () => displayStatus('Connected to server');
+	  websocket.onclose = () => {
+		displayStatus('Disconnected. Reconnecting...');
+		setTimeout(initializeWebSocket, 2000);
+	  };
+	  websocket.onerror = (error) => console.error('WebSocket Error:', error);
+	  websocket.onmessage = (event) => {
+		try {
+		  const data = JSON.parse(event.data);
+		  updateInputs(data);
+		} catch (e) {
+		  console.error('Failed to parse WebSocket message:', e);
+		}
+	  };
+
+	  window.websocket = websocket; // Store globally
+	}
+
+	function saveAllSettings() {
+	  const formData = {};
+	  monitoredVariables.forEach(variable => {
+		const inputElement = document.getElementById(variable);
+		if (inputElement) {
+		  formData[variable] = (inputElement.type === 'checkbox')
+			? inputElement.checked
+			: parseValue(inputElement.value, variableTypes[variable] || 'number');
+		}
+	  });
+
+	  sendData(formData);
+	  
+	  window.location.href = "/";
+	}
+
+	function sendData(data) {
+	  if (window.websocket && window.websocket.readyState === WebSocket.OPEN) {
+		window.websocket.send(JSON.stringify(data));
+		console.log('Settings saved:', data);
+	  } else {
+		console.error('WebSocket is not open. Cannot send data.');
+	  }
+	}
+
+	function updateInputs(data) {
+	  for (const key in data) {
+		const inputElement = document.getElementById(key);
+		if (inputElement) {
+		  if (inputElement.type === 'checkbox') {
+			inputElement.checked = data[key];
+		  } else {
+			inputElement.value = data[key];
+		  }
+		}
+	  }
+	}
+
+	function displayStatus(message) {
+	  const statusElement = document.getElementById('status');
+	  if (statusElement) statusElement.textContent = message;
+	}
+
+	function parseValue(value, type) {
+	  switch (type) {
+		case 'float': return parseFloat(value) || 0;
+		case 'int': return parseInt(value) || 0;
+		case 'boolean': return Boolean(value);
+		default: return String(value);
+	  }
+	}
+
+	// Monitored variables and their types
+	const monitoredVariables = [
+	  "SSID", "Password", "StaticIP", "Gateway", "Subnet",
+	  "efisFreq", "imuFreq", "eisFreq", "apHeadingKp", "apHeadingKd",
+	  "apAltitudeKp", "apAltitudeKd", "maxPitch", "maxRoll", "maxVertical",
+	  "servoMin", "servoMax", "servoFreq", "apServoAdjustmentRate", "debugFreq",
+	  "trimMin", "trimMax", "scPitchRoll", "scHeading", "scSlip"
+	];
+
+	const variableTypes = {
+	  "SSID": "string", "Password": "string", "StaticIP": "string",
+	  "Gateway": "string", "Subnet": "string",
+	  "efisFreq": "int", "imuFreq": "int", "eisFreq": "int",
+	  "apHeadingKp": "float", "apHeadingKd": "float",
+	  "apAltitudeKp": "float", "apAltitudeKd": "float",
+	  "maxPitch": "float", "maxRoll": "float", "maxVertical": "float",
+	  "servoMin": "int", "servoMax": "int", "servoFreq": "int",
+	  "apServoAdjustmentRate": "float", "debugFreq": "int", "trimMin": "int", "trimMax": "int",
+	  "scPitchRoll": "boolean", "scHeading": "boolean", "scSlip": "boolean"
+	};
+
+  </script>
+</body>
+</html>

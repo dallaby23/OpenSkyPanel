@@ -1,0 +1,3504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EFIS</title>
+<style>
+/* Global Styles */
+* {
+	box-sizing: border-box;
+}
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: black;
+	overflow: hidden;
+}
+
+.page {
+	display: none;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.page.active {
+	display: block;
+}
+
+#efis-switch-button {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 120px;
+	background-color: yellow;
+	color: black;
+	border-style: dashed;
+	border-color: yellow;
+	border-width: 5px;
+	border-radius: 5px;
+	padding: 10px 10px;
+	font-size: 16px;
+	cursor: pointer;
+	box-shadow: inset 0px -2px 5px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+}
+
+#efis-ap-button {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	width: 100px;
+	background-color: yellow;
+	color: black;
+	border-style: dashed;
+	border-color: yellow;
+	border-width: 5px;
+	border-radius: 5px;
+	padding: 10px 10px;
+	font-size: 16px;
+	cursor: pointer;
+	box-shadow: inset 0px -2px 5px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+}
+
+#efis-trim-button {
+	position: absolute;
+	bottom: 10px;
+	left: 130px;
+	width: 100px;
+	background-color: yellow;
+	color: black;
+	border-style: dashed;
+	border-color: yellow;
+	border-width: 5px;
+	border-radius: 5px;
+	padding: 10px 10px;
+	font-size: 16px;
+	cursor: pointer;
+	box-shadow: inset 0px -2px 5px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+}
+
+#efis-gensettings-button {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	width: 100px;
+	background-color: yellow;
+	color: black;
+	border-style: dashed;
+	border-color: yellow;
+	border-width: 5px;
+	border-radius: 5px;
+	padding: 10px 10px;
+	font-size: 16px;
+	cursor: pointer;
+	box-shadow: inset 0px -2px 5px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+}
+
+#eis-switch-button {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background-color: yellow;
+	color: black;
+	border-style: dashed;
+	border-color: yellow;
+	border-width: 5px;
+	border-radius: 5px;
+	padding: 10px 20px;
+	font-size: 16px;
+	cursor: pointer;
+	box-shadow: inset 0px -2px 5px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+}
+
+#efisPage {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#eisPage {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+	background-color: black;
+	color: white;
+	font-family: Arial, sans-serif;														
+	position: relative;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+/* Primary Flight Display (PFD) Styles */
+/*-----------------------------------*/
+/* PFD Styles */
+#horizon {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1;
+}
+
+/* Heading Indicator Styles */
+/*-----------------------------------*/
+/* Heading Instrument Styles */
+#heading {
+	position: absolute;
+	top: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 500px;
+	height: 100px;
+	overflow: hidden;
+	cursor: pointer;
+	background-color: rgba(0, 0, 0, 0.6);
+	font-family: 'Courier New', Courier, monospace;
+	border-radius: 10px;
+	z-index: 2;
+}
+
+#heading .tapeContainer {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+#heading .ticker-tape-horizontal {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+	transition: transform 0.6s ease;
+}
+
+#heading .ticker-tape-horizontal div {
+	width: 50px;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	font-size: 1.5rem;
+	color: #ffffff;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+#heading .center-line {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background-color: red;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+#heading .bug-triangle {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-bottom: 15px solid #c97deb;
+	top: 30px;
+	left: 50%;
+	transform: translateX(-50%);
+	transition: left 0.5s ease;
+}
+
+#heading .heading-center-box {
+	position: absolute;
+	left: 50%;
+	top: 50px;
+	transform: translateX(-50%);
+	background-color: black;
+	color: yellow;
+	padding: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border: 2px solid yellow;
+	border-radius: 5px;
+	text-align: center;
+	width: 75px;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+}
+
+#heading .heading-target-box {
+	position: absolute;
+	left: 10%;
+	top: 50px;
+	transform: translateX(-50%);
+	background-color: rgba(0, 0, 0, 0.5);
+	color: #c97deb;
+	padding: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border: 2px;
+	border-radius: 5px;
+	text-align: center;
+	width: 75px;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+}
+
+/* AoA Indicator Styles */
+/*-----------------------------------*/
+#aoaGaugeContainer {
+	position: absolute;
+	top: 50%; /* Adjust for placement */
+	left: .5%;   /* Adjust for placement */
+	transform: translateY(-50%);
+	width: 60px;
+	height: 226px;
+	overflow: hidden;
+	background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+	border-radius: 10px; /* Rounded corners */
+	cursor: pointer;
+	z-index: 2;
+	display: flex;
+	flex-direction: column; /* Start animation from the bottom */
+	align-items: center;
+	justify-content: space-between;
+}
+
+#aoaGaugeContainer .aoa-segment {
+	width: 80%;
+	height: 20px;
+	opacity: 0; /* Initially hidden */
+	background-color: transparent; /* Invisible initially */
+	transition: opacity 0.5s ease, background-color 0.5s ease;
+}
+
+#aoaGaugeContainer .aoa-segment-red {
+	background-color: red;
+}
+
+#aoaGaugeContainer .aoa-segment-yellow {
+	background-color: yellow;
+}
+
+#aoaGaugeContainer .aoa-segment-green {
+	background-color: green;
+}
+
+#aoaGaugeContainer .aoa-center-circle {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-color: green;
+	opacity: 0; /* Initially hidden */
+	transition: opacity 0.5s ease;
+}
+
+/* Airspeed Indicator Styles */
+/*-----------------------------------*/
+#airspeedTickerContainer {
+	position: absolute;
+	top: 50%;
+	left: calc(.5% + 60px);
+	transform: translateY(-50%);
+	width: 130px;
+	height: 300px;
+	overflow: hidden;
+	background-color: rgba(0, 0, 0, 0.6);
+	border-radius: 10px;
+	cursor: pointer;
+	font-family: 'Courier New', Courier, monospace;
+	z-index: 2;
+}
+
+#airspeedTickerContainer .ticker-tape {
+	position: absolute;
+	top: 0;
+	left: 3px;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	transition: top 0.6s ease;
+}
+
+#airspeedTickerContainer .ticker-tape span {
+	font-size: 1.5rem;
+	color: #ffffff;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+#airspeedTickerContainer .center-box {
+	position: absolute;
+	right: 4px;
+	top: 50%;
+	transform: translateY(-50%);
+	background-color: black;
+	color: yellow;
+	padding: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border: 2px solid yellow;
+	border-radius: 5px;
+	text-align: center;
+	width: 75px;
+}
+
+#airspeedTickerContainer .target-box {
+	position: absolute;
+	right: 5%;
+	top: 10%;
+	background-color: rgba(0, 0, 0, 0.5);
+	transform: translateY(-50%);
+	color: #c97deb;
+	padding: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border-radius: 5px;
+	text-align: center;
+	width: 65px;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+}
+
+#airspeedTickerContainer .target-value {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-left: 15px solid #c97deb;
+	border-top: 10px solid transparent;
+	border-bottom: 10px solid transparent;
+	left: 1%;
+	transition: top 0.5s ease;
+}
+
+#airspeedTickerContainer .line {
+	position: absolute;
+	left: 2px;
+	right: 80px;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 2px;
+	background-color: red;
+}
+
+#airspeedTickerContainer .ground-speed-line {
+	position: absolute;
+	width: 5px;
+	background-color: white;
+	left: 0px; /* Adjust the position to align with the desired point */
+	transform: translateX(-50%);
+	transition: top 0.5s ease;
+}
+
+/* Altimeter Styles */
+/*-----------------------------------*/
+#altitudeInstrument {
+	position: absolute;
+	top: 50%;
+	right: calc(.5% + 60px);
+	transform: translateY(-50%);
+	width: 155px;
+	height: 300px;
+	overflow: hidden;
+	background-color: rgba(0, 0, 0, 0.6);
+	border-radius: 10px;
+	font-family: 'Courier New', Courier, monospace;
+	cursor: pointer;
+	z-index: 2;
+}
+
+#altitudeInstrument .altitude-ticker-container {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+#altitudeInstrument .altitude-ticker {
+	position: absolute;
+	top: 0;
+	left: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	transition: top 0.6s ease;
+	height: 100%;
+	justify-content: space-between;
+}
+
+#altitudeInstrument .altitude-ticker span {
+	line-height: 2rem;
+	height: 2rem; /* Ensure consistent element height */
+	font-size: 1.5rem;
+	color: #ffffff;
+	text-shadow:
+	-0.5px -0.5px 0 #000,
+	0.5px -0.5px 0 #000,
+	-0.5px  0.5px 0 #000,
+	0.5px  0.5px 0 #000;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+#altitudeInstrument .altitude-center-box {
+	position: absolute;
+	right: 2px;
+	top: 50%;
+	transform: translateY(-50%);
+	background-color: black;
+	color: yellow;
+	padding: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border: 2px solid yellow;
+	border-radius: 5px;
+	text-align: center;
+	width: 75px;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+}
+
+#altitudeInstrument .altitude-target-box {
+	position: absolute;
+	right: 5%;
+	top: 10%;
+	background-color: rgba(0, 0, 0, 0.5);
+	transform: translateY(-50%);
+	color: #c97deb;
+	padding: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border-radius: 5px;
+	text-align: center;
+	width: 75px;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+}
+
+#altitudeInstrument .altitude-target-value {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-left: 15px solid #c97deb;
+	border-top: 10px solid transparent;
+	border-bottom: 10px solid transparent;
+	left: 1%;
+	transition: top 0.5s ease;
+}
+
+/* Altimeter Setting Box Styles */
+#altitudeInstrument .altitude-setting-box {
+	position: absolute;
+	right: 3%;
+	top: 95%; /* Positioned at the bottom */
+	transform: translateY(-50%);
+	background-color: rgba(0, 0, 0, 0.5);
+	color: white;
+	font-size: 1.5rem;
+	font-weight: bold;
+	border-radius: 5px;
+	text-align: center;
+	width: 82px;
+	text-shadow:
+	-1px -1px 0 #000,
+	1px -1px 0 #000,
+	-1px  1px 0 #000,
+	1px  1px 0 #000;
+	cursor: pointer;
+}
+
+#altitudeInstrument .altitude-line {
+	position: absolute;
+	left: 0;
+	right: 80px;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 2px;
+	background-color: red;
+}
+
+/* VSI Styles */
+/*-----------------------------------*/
+#verticalSpeed {
+	position: absolute;
+	top: 50%;
+	right: .5%; /* Positioned next to the Altimeter */
+	transform: translateY(-50%);
+	width: 60px;
+	height: 225px; /* 75% of 300px */
+	background-color: rgba(0, 0, 0, 0.6);
+	border-radius: 10px;
+	cursor: pointer;
+	z-index: 2;
+}
+
+#verticalSpeed .vsi-ticker-tape-vertical {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column-reverse;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#verticalSpeed .vsi-ticker-span {
+	font-size: 0.8rem;
+	color: #ffffff;
+	text-shadow:
+	-0.5px -0.5px 0 #000,
+	0.5px -0.5px 0 #000,
+	-0.5px 0.5px 0 #000,
+	0.5px 0.5px 0 #000;
+	font-family: 'Courier New', Courier, monospace;
+	text-align: center;
+}
+
+#verticalSpeed .vsi-line {
+	position: absolute;
+	left: 5px;
+	right: 5px;
+	height: 4px;
+	background-color: red;
+	top: 50%;
+	transition: top 0.5s ease;
+}
+
+/* Slip Indicator Styles */
+/*-----------------------------------*/
+#slipIndicator {
+	position: absolute;
+	bottom: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 20vw;
+	max-width: 500px;
+	height: 5vh;
+	max-height: 100px;
+	background-color: rgba(0, 0, 0, 0.8);
+	border: 2px solid #555;
+	border-radius: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+}
+
+/* Static Lines */
+#slipIndicator .slip-line {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background-color: #fff;
+}
+
+#slipIndicator .slip-line.left {
+	left: 40%;
+}
+
+#slipIndicator .slip-line.right {
+	right: 40%;
+}
+
+/* Slip Ball */
+#slipIndicator .slip-ball {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 14%;
+	height: 90%;
+	max-width: 80px;
+	max-height: 80px;
+	background-color: #ff0;
+	border-radius: 50%;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+	transition: left 0.5s ease;
+}
+
+/* RPM Gauge Styles */
+/*-----------------------------------*/
+#rpmGaugeContainer {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	width: 200px;
+	height: 100px;
+	overflow: hidden;
+	cursor: pointer;
+	z-index: 2;
+}
+
+#rpmGaugeContainer svg {
+	width: 200px;
+	height: 200px;
+}
+
+#rpmGaugeContainer .progress-bg,
+/* Enhanced Progress Bar */
+#rpmGaugeContainer .progress-bar {
+	fill: none;
+	stroke-width: 10;
+	stroke-linecap: round;
+	stroke: green; /* Default color */
+	stroke-dasharray: 5, 2; /* Notched effect */
+	transition: stroke-dashoffset 0.5s ease-out, stroke 0.3s ease-out; /* Smooth animation */
+}
+
+#rpmGaugeContainer .progress-bg {
+	stroke: #444;
+}
+
+#rpmGaugeContainer .progress-bar {
+	stroke: green;
+	stroke-linecap: round;
+	transition: stroke-dashoffset 0.3s ease-in-out, stroke 0.3s ease-in-out;
+}
+
+#rpmGaugeContainer .digital-readout {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	text-align: center;
+	font-size: 1.8rem;
+	color: #ffffff;
+	text-shadow:
+	-0.5px -0.5px 0 #000,
+	0.5px -0.5px 0 #000,
+	-0.5px  0.5px 0 #000,
+	0.5px  0.5px 0 #000;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+/* Modals Styles */
+.modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.8);
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-size: 16px;
+	padding: 20px;
+	z-index: 10;
+}
+
+.modal-content {
+	background-color: #333;
+	padding: 20px;
+	border-radius: 10px;
+	width: 90%;
+	max-width: 500px;
+	overflow-y: auto;
+	max-height: 80%;
+}
+
+.modal-content label, .modal-content input, .modal-content button, .modal-content select {
+	width: 100%;
+	display: block;
+	font-size: 16px;
+	margin-top: 10px;
+}
+
+.modal-content input, .modal-content button, .modal-content select {
+	padding: 10px;
+	border-radius: 5px;
+	border: none;
+	font-size: 16px;
+}
+
+.modal-content button {
+	background-color: #c97deb;
+	color: white;
+	cursor: pointer;
+}
+
+.modal-content .close {
+	color: #c97deb;
+	font-size: 24px;
+	float: right;
+	cursor: pointer;
+}
+
+.slider-group {
+	margin: 20px 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.slider-group input[type="range"] {
+	width: 100%;
+	margin-top: 10px;
+}
+
+input[type="range"][orient='vertical'] {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    vertical-align: middle;
+	height: 200px;
+}
+
+#splash-screen {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 10;
+}
+
+#splash-screen button {
+	padding: 20px 40px;
+	font-size: 18px;
+	background-color: #007BFF;
+	color: white;
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 60px;
+	height: 34px;
+	margin-bottom: 10px;
+}
+
+.switch input { 
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.switch .slider {
+	position: absolute;
+	cursor: pointer;
+	background-color: #ccc;
+	border-radius: 34px;
+	width: 60px;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	transition: .4s;
+}
+
+.switch .slider:before {
+	position: absolute;
+	content: "";
+	background-color: white;
+	height: 26px;
+	width: 26px;
+	border-radius: 50%;
+	left: 4px;
+	bottom: 4px;
+	transition: .4s;
+}
+
+.switch input:checked + .slider {
+	background-color: #c97deb;
+}
+
+.switch input:focus + .slider {
+	box-shadow: 0 0 1px #c97deb;
+}
+
+.switch input:checked + .slider:before {
+	transform: translateX(26px);
+}
+
+.toggle-container {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 10px;
+}
+
+.eis-title {
+	font-size: 24px;
+	color: #c97deb;
+	text-align: center;
+	margin-bottom: 80px;
+	width: 100%;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7), -1px -1px 1px rgba(200, 200, 255, 0.3);
+	letter-spacing: 1px;
+	cursor: pointer;
+}
+
+.eis-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	width: 100%;
+	max-width: 100%;
+	flex-wrap: wrap;
+	gap: 100px;
+	margin: 0 auto;
+}
+
+.eis-column {
+	display: flex;
+	flex-direction: column;
+	gap: 80px;
+}
+
+.eis-gauge {
+	width: 200px;
+	user-select: none;
+}
+
+.eis-gauge-title {
+	font-size: 18px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	white-space: nowrap;
+	cursor: pointer;
+	text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+}
+
+.eis-gauge-title span {
+	font-weight: bold;
+	font-size: 18px;
+	min-width: 40px;
+	text-align: right;
+}
+
+.eis-bar-container {
+	position: relative;
+	width: 100%;
+	height: 30px;
+	background-color: white;
+	border-radius: 15px;
+	overflow: hidden;
+	border: 1px solid black;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	box-shadow: inset 0px -2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.eis-bar {
+	height: 100%;
+	border-radius: 15px 0 0 15px;
+	width: 50%;
+	transition: width 0.3s, background-color 0.3s;
+}
+
+/* Alert Bar on EIS page */
+.eis-alert-bar {
+	position: fixed;
+	bottom: 1%;
+	left: 0;
+	width: 100%;
+	height: 10%;
+	background-color: black;
+	transition: background-color 0.3s;
+	visibility: hidden;
+	z-index: 9999;
+}
+
+.eis-modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.8);
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-size: 16px;
+	padding: 20px;
+	z-index: 10;
+}
+
+.eis-modal-content {
+	background-color: #333;
+	padding: 20px;
+	border-radius: 10px;
+	width: 90%;
+	max-width: 500px;
+	overflow-y: auto;
+	max-height: 80%;
+}
+
+.eis-modal-content label {
+	display: block;
+	margin-top: 10px;
+}
+
+.eis-modal-content input, .eis-modal-content button {
+	width: 100%;
+	padding: 5px;
+	font-size: 16px;
+	margin-top: 5px;
+	border-radius: 5px;
+	border: none;
+}
+
+.eis-modal-content .eis-close {
+	color: #c97deb;
+	font-size: 24px;
+	float: right;
+	cursor: pointer;
+}
+
+.eis-modal-content button {
+	background-color: #c97deb;
+	color: white;
+	cursor: pointer;
+	margin-top: 20px;
+}
+
+@media (max-width: 800px) {
+	.eis-container {
+		flex-direction: column;
+		align-items: center;
+	}
+	.eis-column {
+		width: 100%;
+		align-items: center;
+	}
+}
+</style>
+</head>
+<body>
+	<!-- Splash Screen -->
+	<div id="splash-screen">
+		<button onclick="enterApp()">Begin</button>
+	</div>
+	
+	<!-- EFIS Page -->
+	<div id="efisPage" class="page active">
+		<button id="efis-switch-button" onclick="switchPage('eisPage')">Go to EIS</button>
+		<button id="efis-ap-button" onclick="AutopilotSettings.openSettings()">Autopilot</button>
+		<button id="efis-trim-button" onclick="Trim.openSettings()">Trim</button>
+		<button id="efis-gensettings-button" onclick="GeneralSettings.openSettings()">Settings</button>
+		
+		<canvas id="horizon"></canvas>
+		
+		<!-- General Settings Modal -->
+		<div class="modal" id="generalSettingsModal">
+			<div class="modal-content">
+				<h2>General Configuration</h2>
+				<div class="toggle-container">
+					<label for="stratuxToggle">Use Stratux Data:</label>
+					<label class="switch">
+						<input type="checkbox" id="stratuxToggle">
+						<span class="slider round"></span>
+					</label>
+				</div>
+				<button type="button" id='cage' class="cage">Cage PFD</button>
+				<button type="button" class="close-general">Close</button>
+			</div>
+		</div>
+		
+		<!-- Trim Settings Modal -->
+		<div class="modal" id="trimSettingsModal">
+			<div class="modal-content">
+				<!-- Vertical Slider for Pitch Trim -->
+				<div class="slider-group">
+					<label for="pitchTrimSlider">Pitch Trim</label>
+					<input type="range" id="pitchTrimSlider" min="0" max="100" value="50" orient="vertical">
+				</div>
+				
+				<!-- Horizontal Slider for Roll Trim -->
+				<div class="slider-group">
+					<label for="rollTrimSlider">Roll Trim</label>
+					<input type="range" id="rollTrimSlider" min="0" max="100" value="50">
+				</div>
+				
+				<!-- Close Button -->
+				<button type="button" class="close-trim">Close</button>
+			</div>
+		</div>
+		
+		<!-- Heading Indicator -->
+		<div id="heading" onclick="HeadingIndicator.openSettings()">
+			<div class="tapeContainer">
+				<div class="ticker-tape-horizontal" id="headingTicker"></div>
+				<div class="center-line"></div>
+				<div class="bug-triangle" id="bugTriangle"></div>
+				<div class="heading-center-box" id="headingValueBox">0</div>
+				<div class="heading-target-box" id="headingTargetBox">0</div>
+			</div>
+		</div>
+		
+		<!-- Heading Indicator Modal -->
+		<div class="modal" id="headingSettingsModal">
+			<div class="modal-content">
+				<span class="close" onclick="HeadingIndicator.closeSettings()">&times;</span>
+				<h2>Heading Configuration</h2>
+				<label>Set Heading Bug (0-359):</label>
+				<input type="number" id="headingBugInput" min="0" max="359" value="0">
+				<button type="button" class="save-heading">Save</button>
+			</div>
+		</div>
+		
+		<!-- AoA Indicator -->
+		<div id="aoaGaugeContainer" onclick="AoAIndicator.openSettings()">
+			<div class="aoa-segment aoa-segment-red"></div>
+			<div class="aoa-segment aoa-segment-yellow"></div>
+			<div class="aoa-segment aoa-segment-yellow"></div>
+			<div class="aoa-segment aoa-segment-yellow"></div>
+			<div class="aoa-center-circle"></div>
+			<div class="aoa-segment aoa-segment-green"></div>
+			<div class="aoa-segment aoa-segment-green"></div>
+			<div class="aoa-segment aoa-segment-green"></div>
+		</div>
+		
+		<!-- AoA Configuration Modal -->
+		<div class="modal" id="aoaSettingsModal">
+			<div class="modal-content">
+				<span class="close" onclick="AoAIndicator.closeSettings()">&times;</span>
+				<h3>AoA Configuration</h3>
+				<label for="aoaStallValueInput">Stall Value:</label>
+				<input type="number" id="aoaStallValueInput" step="0.1" value="4" min="0" max="10">
+				<button type="button" class="save-aoa">Save</button>
+			</div>
+		</div>
+		
+		<!-- Airspeed Indicator -->
+		<div id="airspeedTickerContainer" onclick="AirspeedIndicator.openSettings()">
+			<div class="ticker-tape" id="airspeedMarquee"></div>
+			<div class="center-box" id="airspeedCenterValueBox">0</div>
+			<div class="target-value" id="targetValueIndicator"></div>
+			<div class="target-box" id="targetValueBox">0</div>
+			<div class="line"></div>
+			<div class="ground-speed-line" id="groundSpeedLine"></div>
+		</div>
+		
+		<!-- Airspeed Indicator Modal -->
+		<div class="modal" id="airspeedSettingsModal">
+			<div class="modal-content">
+				<span class="close" onclick="AirspeedIndicator.closeSettings()">&times;</span>
+				<h2>Airspeed Configuration</h2>
+				<label>Airspeed Bug:</label>
+				<input type="number" id="targetValueInput" min="0" value="70">
+				<label>Max Value:</label>
+				<input type="number" id="airspeedMaxValueInput" min="0" value="150">
+				<label>Yellow Alert Min:</label>
+				<input type="number" id="airspeedYellowMinInput" value="10">
+				<label>Yellow Alert Max:</label>
+				<input type="number" id="airspeedYellowMaxInput" value="100">
+				<label>Red Alert Min:</label>
+				<input type="number" id="airspeedRedMinInput" value="5">
+				<label>Red Alert Max:</label>
+				<input type="number" id="airspeedRedMaxInput" value="120">
+				<button type="button" class="save-airspeed">Save</button>
+			</div>
+		</div>
+		
+		<!-- Altimeter -->
+		<div id="altitudeInstrument" onclick="Altimeter.openSettings()">
+			<div class="altitude-ticker-container">
+				<div class="altitude-ticker" id="altitudeTicker"></div>
+				<div class="altitude-center-box" id="altitudeValueBox">0</div>
+				<div class="altitude-target-value" id="altitudeTargetValueIndicator"></div>
+				<div class="altitude-target-box" id="altitudeTargetValueBox">0</div>
+				<div class="altitude-setting-box" id="altitudeSettingBox">29.92</div>
+				<div class="altitude-line"></div>
+			</div>
+		</div>
+		
+		<!-- Altimeter Modal -->
+		<div class="modal" id="altitudeSettingsModal">
+			<div class="modal-content">
+				<span class="close" onclick="Altimeter.closeSettings()">&times;</span>
+				<h2>Altitude Configuration</h2>
+				<label>Altimeter Setting (inHg):</label>
+				<input type="number" id="altimeterSettingInput" step="0.01" value="29.92" min="25.00" max="35.00">
+				<label>Step Value:</label>
+				<input type="number" id="altitudeStepValue" value="100">
+				<label>Altitude Bug (0-150000):</label>
+				<input type="number" id="altitudeBugInput" min="0" max="150000" value="0">
+				<button type="button" class="save-altitude">Save</button>
+			</div>
+		</div>
+		
+		<!-- VSI -->
+		<div id="verticalSpeed" onclick="VSIIndicator.openSettings()">
+			<div class="vsi-ticker-tape-vertical" id="vsiTicker"></div>
+			<div class="vsi-line" id="vsiLine"></div>
+		</div>
+		
+		<!-- VSI Modal -->
+		<div class="modal" id="vsiModal">
+			<div class="modal-content">
+				<span class="close" onclick="VSIIndicator.closeSettings()">&times;</span>
+				<h3>VSI Configuration</h3>
+				<label for="vsiScaleInput">Scale Value:</label>
+				<input type="number" id="vsiScaleInput" value="4000" min="1000" step="1000">
+				<label for="vsiSegmentsInput">Number of Segments (2 or 4):</label>
+				<select id="vsiSegmentsInput">
+					<option value="2">2</option>
+					<option value="4" selected>4</option>
+				</select>
+				<button type="button" class="save-vsi">Save</button>
+			</div>
+		</div>
+		
+		<!-- Slip Indicator -->
+		<div id="slipIndicator">
+			<div class="slip-line left"></div>
+			<div class="slip-line right"></div>
+			<div class="slip-ball" id="slipBall"></div>
+		</div>
+		
+		<!-- RPM Gauge -->
+		<div id="rpmGaugeContainer" onclick="RPMGauge.openSettings()">
+			<svg viewBox="0 0 200 200">
+				<path d="M 30 100 A 70 70 0 0 1 170 100" class="progress-bg" style="stroke:#444;fill:none;stroke-width:10;"></path>
+				<path d="M 30 100 A 70 70 0 0 1 170 100" class="progress-bar" id="progress-bar"></path>
+			</svg>
+			<div class="digital-readout" id="digital-readout">0</div>
+		</div>
+		
+		<!-- RPM Gauge Modal -->
+		<div class="modal" id="rpmSettingsModal">
+			<div class="modal-content">
+				<span class="close" onclick="RPMGauge.closeSettings()">&times;</span>
+				<h3>RPM Configuration</h3>
+				<label for="rpmMaxValue">Max Value</label>
+				<input type="number" id="rpmMaxValue" value="6000">
+				<label for="rpmYellowAlert">Yellow Alert Value</label>
+				<input type="number" id="rpmYellowAlert" value="5300">
+				<label for="rpmRedAlert">Red Alert Value</label>
+				<input type="number" id="rpmRedAlert" value="5600">
+				<button type="button" class="save-rpm">Save</button>
+			</div>
+		</div>
+		
+		<!-- Autopilot Settings Modal -->
+		<div class="modal" id="autopilotSettingsModal">
+			<div class="modal-content">
+				<h2>Autopilot Configuration</h2>
+				<div class="toggle-container">
+					<label for="apEngageToggle">Engage:</label>
+					<label class="switch">
+						<input type="checkbox" id="apEngageToggle">
+						<span class="slider round"></span>
+					</label>
+				</div>
+				<div class="toggle-container">
+					<label for="apAltitudeHoldToggle">Altitude Hold:</label>
+					<label class="switch">
+						<input type="checkbox" id="apAltitudeHoldToggle">
+						<span class="slider round"></span>
+					</label>
+				</div>
+				<div class="toggle-container">
+					<label for="apWingLevelerToggle">Heading Hold / Wing Leveler:</label>
+					<label class="switch">
+						<input type="checkbox" id="apWingLevelerToggle">
+						<span class="slider round"></span>
+					</label>
+				</div>
+				<button type="button" class="close-autopilot">Close</button>
+			</div>
+		</div>
+	</div> 
+	
+	<!-- EIS Page -->
+	<div id="eisPage" class="page">
+		<button id="eis-switch-button" onclick="switchPage('efisPage')">Go to EFIS</button>
+		
+		<div class="eis-title" id="eis-page-title" ondblclick="restoreGaugeVisibility()">Engine Information System</div>
+		
+		<div id="hobbs-meter" style="position:absolute; top:20px; left:20px; color:white; font-size:24px; font-family:Arial; z-index:9999;">
+			Hobbs: 00:00
+		</div>
+		
+		<div id="eis-alert-bar" class="eis-alert-bar"></div>
+		
+		<div class="eis-container">
+			<div class="eis-column">
+				<div class="eis-gauge" id="eis-sensor1">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor1')"><span id="eis-sensor1-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor1-bar"></div>
+					</div>
+				</div>
+				<div class="eis-gauge" id="eis-sensor2">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor2')"><span id="eis-sensor2-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor2-bar"></div>
+					</div>
+				</div>
+				<div class="eis-gauge" id="eis-sensor3">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor3')">Temperature <span id="eis-sensor3-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor3-bar"></div>
+					</div>
+				</div>
+			</div>
+			<div class="eis-column">
+				<div class="eis-gauge" id="eis-sensor4">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor4')">Voltage <span id="eis-sensor4-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor4-bar"></div>
+					</div>
+				</div>
+				<div class="eis-gauge" id="eis-sensor5">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor5')">RPM <span id="eis-sensor5-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor5-bar"></div>
+					</div>
+				</div>
+				<div class="eis-gauge" id="eis-sensor6">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor6')">Coolant Temp <span id="eis-sensor6-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor6-bar"></div>
+					</div>
+				</div>
+			</div>
+			<div class="eis-column">
+				<div class="eis-gauge" id="eis-sensor7">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor7')">Oil Temp <span id="eis-sensor7-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor7-bar"></div>
+					</div>
+				</div>
+				<div class="eis-gauge" id="eis-sensor8">
+					<div class="eis-gauge-title" onclick="openGaugeConfig('sensor8')">Fuel Level <span id="eis-sensor8-value">0</span></div>
+					<div class="eis-bar-container">
+						<div class="eis-bar" id="eis-sensor8-bar"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- EIS Modal for Gauge Configuration -->
+		<div class="eis-modal" id="eis-modal">
+			<div class="eis-modal-content">
+				<span class="eis-close" onclick="closeGaugeConfig()">&times;</span>
+				<h2 id="eis-modal-title">Gauge Configuration</h2>
+				<label for="eis-sensor-name">Sensor Name:</label>
+				<input type="text" id="eis-sensor-name">
+				<label>Min Value:</label>
+				<input type="number" id="eis-gauge-min">
+				<label>Max Value:</label>
+				<input type="number" id="eis-gauge-max">
+				<label>Yellow Alert Min:</label>
+				<input type="number" id="eis-gauge-yellow-min">
+				<label>Yellow Alert Max:</label>
+				<input type="number" id="eis-gauge-yellow-max">
+				<label>Red Alert Min:</label>
+				<input type="number" id="eis-gauge-red-min">
+				<label>Red Alert Max:</label>
+				<input type="number" id="eis-gauge-red-max">
+				<label for="eis-sensor-visible">Visible:</label>
+				<input type="checkbox" id="eis-sensor-visible">
+				<button type="button" onclick="saveGaugeSettings()">Save</button>
+			</div>
+		</div>
+		
+	</div>
+
+
+<script>
+// ***** Global Variables *****
+let settings = {
+	efis: {},
+	gaugeConfigs: {}
+};
+
+let gaugeConfigs = {};
+let currentGaugeId = null; 
+let alertFlashInterval = null;
+let websocket = null;
+
+let trimMin = 0;
+let trimMax = 0;
+		
+
+const monitoredVariables = [
+	"pitch","roll","heading","airspeed","groundSpeed","altitude","verticalSpeed","slip","rpm","aoa",
+	"vOPressure","vFPressure","vOTemp","vWTemp","vCTemp","vVolt","vCurrent","vFuelLevel","hours","minutes",
+	"headingBug","aoaStallVal","airspeedBug","airspeedMax","airspeedYellowMin","airspeedYellowMax","airspeedRedMin","airspeedRedMax","vsiScaleVal","vsiSegments","altitudeStep","altitudeBug","altimeterSetting","rpmMax","rpmYellow","rpmRed","apEngage","apAltitudeHold","apWingLeveler","pitchTrim","rollTrim","trimMin","trimMax",
+	"sensor1Label","sensor1MinConfig","sensor1MaxConfig","sensor1YellowMin","sensor1YellowMax","sensor1RedMin","sensor1RedMax",
+	"sensor2Label","sensor2MinConfig","sensor2MaxConfig","sensor2YellowMin","sensor2YellowMax","sensor2RedMin","sensor2RedMax",
+	"sensor3Label","sensor3MinConfig","sensor3MaxConfig","sensor3YellowMin","sensor3YellowMax","sensor3RedMin","sensor3RedMax",
+	"sensor4Label","sensor4MinConfig","sensor4MaxConfig","sensor4YellowMin","sensor4YellowMax","sensor4RedMin","sensor4RedMax",
+	"sensor5Label","sensor5MinConfig","sensor5MaxConfig","sensor5YellowMin","sensor5YellowMax","sensor5RedMin","sensor5RedMax",
+	"sensor6Label","sensor6MinConfig","sensor6MaxConfig","sensor6YellowMin","sensor6YellowMax","sensor6RedMin","sensor6RedMax",
+	"sensor7Label","sensor7MinConfig","sensor7MaxConfig","sensor7YellowMin","sensor7YellowMax","sensor7RedMin","sensor7RedMax",
+	"sensor8Label","sensor8MinConfig","sensor8MaxConfig","sensor8YellowMin","sensor8YellowMax","sensor8RedMin","sensor8RedMax"
+];
+
+const variableTypes = {
+	// EFIS Variables
+	"pitch": "int",
+	"roll": "int",
+	"heading": "int",
+	"airspeed": "int",
+	"groundSpeed": "int",
+	"altitude": "int",
+	"verticalSpeed": "int",
+	"slip": "int",
+	"rpm": "int",
+	"aoa": "int",
+	
+	// EIS Variables
+	"vOPressure": "int",
+	"vFPressure": "int",
+	"vOTemp": "int",
+	"vWTemp": "int",
+	"vCTemp": "int",
+	"vVolt": "int",
+	"vCurrent": "float",
+	"vFuelLevel": "int",
+	"hours": "int",
+	"minutes": "int",
+	
+	// VS Variables
+	"headingBug": "int",
+	"aoaStallVal": "int",
+	"airspeedBug": "int",
+	"airspeedMax": "int",
+	"airspeedYellowMin": "int",
+	"airspeedYellowMax": "int",
+	"airspeedRedMin": "int",
+	"airspeedRedMax": "int",
+	"vsiScaleVal": "int",
+	"vsiSegments": "int",
+	"altitudeStep": "int",
+	"altitudeBug": "int",
+	"altimeterSetting": "float",
+	"rpmMax": "int",
+	"rpmYellow": "int",
+	"rpmRed": "int",
+	"apEngage": "boolean",
+	"apAltitudeHold": "boolean",
+	"apWingLeveler": "boolean",
+	"pitchTrim": "int",
+	"rollTrim": "int",
+	"trimMin": "int",
+	"trimMax": "int",
+	
+	// EIS Gauge Labels and Configurations
+	"sensor1Label": "string",
+	"sensor1MinConfig": "int",
+	"sensor1MaxConfig": "int",
+	"sensor1YellowMin": "int",
+	"sensor1YellowMax": "int",
+	"sensor1RedMin": "int",
+	"sensor1RedMax": "int",
+	
+	"sensor2Label": "string",
+	"sensor2MinConfig": "int",
+	"sensor2MaxConfig": "int",
+	"sensor2YellowMin": "int",
+	"sensor2YellowMax": "int",
+	"sensor2RedMin": "int",
+	"sensor2RedMax": "int",
+	
+	"sensor3Label": "string",
+	"sensor3MinConfig": "int",
+	"sensor3MaxConfig": "int",
+	"sensor3YellowMin": "int",
+	"sensor3YellowMax": "int",
+	"sensor3RedMin": "int",
+	"sensor3RedMax": "int",
+	
+	"sensor4Label": "string",
+	"sensor4MinConfig": "int",
+	"sensor4MaxConfig": "int",
+	"sensor4YellowMin": "int",
+	"sensor4YellowMax": "int",
+	"sensor4RedMin": "int",
+	"sensor4RedMax": "int",
+	
+	"sensor5Label": "string",
+	"sensor5MinConfig": "int",
+	"sensor5MaxConfig": "int",
+	"sensor5YellowMin": "int",
+	"sensor5YellowMax": "int",
+	"sensor5RedMin": "int",
+	"sensor5RedMax": "int",
+	
+	"sensor6Label": "string",
+	"sensor6MinConfig": "int",
+	"sensor6MaxConfig": "int",
+	"sensor6YellowMin": "int",
+	"sensor6YellowMax": "int",
+	"sensor6RedMin": "int",
+	"sensor6RedMax": "int",
+	
+	"sensor7": "float",
+	"sensor7Label": "string",
+	"sensor7MinConfig": "int",
+	"sensor7MaxConfig": "int",
+	"sensor7YellowMin": "int",
+	"sensor7YellowMax": "int",
+	"sensor7RedMin": "int",
+	"sensor7RedMax": "int",
+	
+	"sensor8Label": "string",
+	"sensor8MinConfig": "int",
+	"sensor8MaxConfig": "int",
+	"sensor8YellowMin": "int",
+	"sensor8YellowMax": "int",
+	"sensor8RedMin": "int",
+	"sensor8RedMax": "int"
+};
+
+// ***** WebSocket Initialization *****
+function initializeWebSocket() {
+	const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+	const host = window.location.hostname;
+	const port = window.location.port ? `:${window.location.port}` : '';
+	const wsPath = '/ws';
+	const gateway = `${protocol}${host}${port}${wsPath}`;
+	
+	console.log(`Attempting to connect to WebSocket at ${gateway}`);
+	websocket = new WebSocket(gateway);
+	
+	websocket.onopen = () => {
+		console.log('WebSocket connection established');
+		displayStatus('Connected to server');
+	};
+	
+	websocket.onclose = (event) => {
+		console.log(`WebSocket connection closed: ${event.reason}`);
+		displayStatus('Disconnected from server. Reconnecting...');
+		// Attempt to reconnect after a delay
+		setTimeout(initializeWebSocket, 2000);
+	};
+	
+	websocket.onerror = (error) => {
+		console.error('WebSocket error:', error);
+		displayStatus('WebSocket error. Check console for details.');
+	};
+	
+	websocket.onmessage = (event) => {
+		//console.log('Message received:', event.data);
+		try {
+			const data = JSON.parse(event.data);
+			//console.log('Parsed data:', data);
+			updateData(data);
+			} catch (e) {
+			console.error('Failed to parse JSON:', e);
+		}
+	};
+}
+
+// ***** Utility Functions *****
+
+// Function to display connection status to the user
+function displayStatus(message) {
+	const statusElement = document.getElementById('status');
+	if (statusElement) {
+		statusElement.textContent = message;
+	}
+}
+
+// Function to send a flat JSON object via WebSocket
+function sendSettings(data) {
+	if (websocket && websocket.readyState === WebSocket.OPEN) {
+		const jsonString = JSON.stringify(data);
+		websocket.send(jsonString);
+		console.log('Settings sent:', jsonString);
+		} else {
+		console.warn('WebSocket is not open. Unable to send settings.');
+	}
+}
+
+/*
+// Function to send individual updates via WebSocket
+function sendUpdate(key, value) {
+	if (websocket && websocket.readyState === WebSocket.OPEN) {
+		const payload = {};
+		
+		// Assign the value based on its type
+		const type = variableTypes[key] || 'number';
+		
+		switch (type) {
+			case 'float':
+			payload[key] = parseFloat(value);
+			break;
+			case 'int':
+			payload[key] = parseInt(value, 10);
+			break;
+			case 'boolean':
+			payload[key] = Boolean(value);
+			break;
+			case 'string':
+			payload[key] = String(value);
+			break;
+			default:
+			payload[key] = value;
+		}
+		
+		websocket.send(JSON.stringify(payload));
+		console.log(`Sent update: ${key} = ${payload[key]}`);
+		} else {
+		console.warn('WebSocket is not open. Unable to send update.');
+	}
+}
+*/
+
+// Function to update all components based on received data
+function updateData(data) {
+	// EFIS Updates
+	if (data.pitch !== undefined && data.roll !== undefined) {
+		PFD.updatePitchAndRoll(data.pitch, data.roll);
+	}
+	
+	if (data.heading !== undefined) {
+		HeadingIndicator.updateHeading(data.heading);
+	}
+	
+	if (data.aoa !== undefined) {
+		AoAIndicator.updateAoA(data.aoa);
+	}
+	
+	if (data.airspeed !== undefined && data.groundSpeed !== undefined) {
+		AirspeedIndicator.updateAirspeed(data.airspeed, data.groundSpeed);
+	}
+	
+	if (data.altitude !== undefined) {
+		Altimeter.updateAltitude(data.altitude);
+	}
+	
+	if (data.verticalSpeed !== undefined) {
+		VSIIndicator.updateVSI(data.verticalSpeed);
+	}
+	
+	if (data.slip !== undefined) {
+		SlipIndicator.setSlipValue(data.slip);
+	}
+	
+	if (data.rpm !== undefined) {
+		RPMGauge.updateRPM(data.rpm);
+	}
+	
+	// EIS and Gauges Updates
+	// Update Hobbs Meter
+	if (data.hours !== undefined && data.minutes !== undefined) {
+		const hobbsMeter = document.getElementById('hobbs-meter');
+		if (hobbsMeter) {
+			let hours = data.hours;
+			let minutes = data.minutes;
+			
+			let formattedHours = hours.toString().padStart(4, '0');
+			let formattedMinutes = minutes.toString().padStart(2, '0');
+			hobbsMeter.textContent = `Hobbs: ${formattedHours}:${formattedMinutes}`;
+		}
+	}
+	
+	// Update EIS Gauges with Correct Data Keys
+	const eisDataMapping = {
+		"sensor1": "vOPressure",
+		"sensor2": "vFPressure",
+		"sensor3": "vOTemp",
+		"sensor4": "vWTemp",
+		"sensor5": "vCTemp",
+		"sensor6": "vVolt",
+		"sensor7": "vCurrent",
+		"sensor8": "vFuelLevel"
+	};
+	
+	for (let sensorId in eisDataMapping) {
+		if (eisDataMapping.hasOwnProperty(sensorId)) {
+			const dataKey = eisDataMapping[sensorId];
+			if (data[dataKey] !== undefined) {
+				updateEISGauge(sensorId, data[dataKey]);
+			}
+		}
+	}
+	
+	// Process Gauge Configurations from Incoming Data
+	for (let i = 1; i <= 8; i++) {
+		let sensorId = `sensor${i}`;
+		let prefix = `sensor${i}`;
+		if (
+			data[`${prefix}Label`] !== undefined ||
+			data[`${prefix}MinConfig`] !== undefined ||
+			data[`${prefix}MaxConfig`] !== undefined ||
+			data[`${prefix}YellowMin`] !== undefined ||
+			data[`${prefix}YellowMax`] !== undefined ||
+			data[`${prefix}RedMin`] !== undefined ||
+			data[`${prefix}RedMax`] !== undefined ||
+			data[`${prefix}Visible`] !== undefined
+			) {
+			
+			if (!gaugeConfigs[sensorId]) gaugeConfigs[sensorId] = {};
+			
+			if (data[`${prefix}Label`] !== undefined) gaugeConfigs[sensorId].name = data[`${prefix}Label`];
+			if (data[`${prefix}MinConfig`] !== undefined) gaugeConfigs[sensorId].min = data[`${prefix}MinConfig`];
+			if (data[`${prefix}MaxConfig`] !== undefined) gaugeConfigs[sensorId].max = data[`${prefix}MaxConfig`];
+			if (data[`${prefix}YellowMin`] !== undefined) gaugeConfigs[sensorId].yellowMin = data[`${prefix}YellowMin`];
+			if (data[`${prefix}YellowMax`] !== undefined) gaugeConfigs[sensorId].yellowMax = data[`${prefix}YellowMax`];
+			if (data[`${prefix}RedMin`] !== undefined) gaugeConfigs[sensorId].redMin = data[`${prefix}RedMin`];
+			if (data[`${prefix}RedMax`] !== undefined) gaugeConfigs[sensorId].redMax = data[`${prefix}RedMax`];
+			if (data[`${prefix}Visible`] !== undefined) gaugeConfigs[sensorId].visible = data[`${prefix}Visible`];
+			
+			// Update gauge label and visibility
+			const gaugeTitle = document.querySelector(`#eis-${sensorId} .eis-gauge-title`);
+			if (gaugeTitle) {
+				const sensorName = gaugeConfigs[sensorId].name || `Sensor ${i}`;
+				gaugeTitle.innerHTML = `${sensorName} <span id="eis-${sensorId}-value">0</span>`;
+			}
+			
+			// Apply visibility
+			const gaugeElement = document.getElementById(`eis-${sensorId}`);
+			if (gaugeElement) {
+				if (gaugeConfigs[sensorId].visible) {
+					gaugeElement.style.display = 'block';
+					} else {
+					gaugeElement.style.display = 'none';
+				}
+			}
+		}
+	}
+	
+	settings.gaugeConfigs = gaugeConfigs;
+	
+	// Update EFIS Settings
+	const efisSettingsKeys = [
+		'headingBug', 'aoaStallVal', 'airspeedBug', 'airspeedMax', 
+		'airspeedYellowMin', 'airspeedYellowMax', 'airspeedRedMin', 
+		'airspeedRedMax', 'vsiScaleVal', 'vsiSegments', 
+		'altitudeStep', 'altitudeBug', 'altimeterSetting', 
+		'rpmMax', 'rpmYellow', 'rpmRed', 
+		'apEngage', 'apAltitudeHold', 'apWingLeveler','pitchTrim','rollTrim','trimMin','trimMax'
+	];
+	
+	efisSettingsKeys.forEach(key => {
+		if (data[key] !== undefined) {
+			if (!settings.efis) settings.efis = {};
+			settings.efis[key] = data[key];
+			
+			// Update respective modules
+			switch(key) {
+				case 'headingBug':
+				HeadingIndicator.updateSettings(settings);
+				break;
+				case 'aoaStallVal':
+				AoAIndicator.updateSettings(settings);
+				break;
+				case 'airspeedBug':
+				case 'airspeedMax':
+				case 'airspeedYellowMin':
+				case 'airspeedYellowMax':
+				case 'airspeedRedMin':
+				case 'airspeedRedMax':
+				AirspeedIndicator.updateSettings(settings);
+				break;
+				case 'vsiScaleVal':
+				case 'vsiSegments':
+				VSIIndicator.updateSettings(settings);
+				break;
+				case 'altitudeStep':
+				case 'altitudeBug':
+				case 'altimeterSetting':
+				Altimeter.updateSettings(settings);
+				break;
+				case 'rpmMax':
+				case 'rpmYellow':
+				case 'rpmRed':
+				RPMGauge.updateSettings(settings);
+				break;
+				case 'apEngage':
+				case 'apAltitudeHold':
+				case 'apWingLeveler':
+				// Autopilot settings are already handled via event listeners
+				break;
+				case 'pitchTrim':
+				case 'rollTrim':
+				case 'trimMin':
+					if (data.trimMin !== undefined) {
+						trimMin = data.trimMin;
+						console.log(`trimMin updated to: ${trimMin}`);
+					}
+					break;
+
+				case 'trimMax':
+					if (data.trimMax !== undefined) {
+						trimMax = data.trimMax;
+						console.log(`trimMax updated to: ${trimMax}`);
+					}
+					break;
+				default:
+				break;
+			}
+		}
+	});
+	
+	// Update Autopilot settings if provided
+	if (data.apEngage !== undefined || data.apAltitudeHold !== undefined || data.apWingLeveler !== undefined) {
+		if (!settings.autopilot) settings.autopilot = {};
+		if (data.apEngage !== undefined) settings.autopilot.engage = data.apEngage;
+		if (data.apAltitudeHold !== undefined) settings.autopilot.altitudeHold = data.apAltitudeHold;
+		if (data.apWingLeveler !== undefined) settings.autopilot.wingLeveler = data.apWingLeveler;
+	}
+}
+
+// Function to update EIS gauges
+function updateEISGauge(gaugeId, value) {
+	const config = gaugeConfigs[gaugeId] || settings.gaugeConfigs[gaugeId] || {};
+	const bar = document.getElementById(`eis-${gaugeId}-bar`);
+	const label = document.getElementById(`eis-${gaugeId}-value`);
+	
+	// Check if bar and label exist
+	if (!bar || !label) {
+		console.error(`Gauge elements for ${gaugeId} not found.`);
+		return;
+	}
+	
+	const min = config.min || 0;
+	const max = config.max || 100;
+	const yellowMin = config.yellowMin || 20;
+	const yellowMax = config.yellowMax || 80;
+	const redMin = config.redMin || 10;
+	const redMax = config.redMax || 90;
+	
+	const percentage = ((value - min) / (max - min)) * 100;
+	bar.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
+	
+	// **Conditional Rounding Based on Variable Type**
+	let displayValue;
+	if (variableTypes[gaugeId] === "float") {
+		// Round to 2 decimal places for float variables
+		displayValue = parseFloat(value).toFixed(2);
+		} else {
+		// Display as integer for int variables
+		displayValue = parseInt(value, 10);
+	}
+	
+	label.textContent = displayValue;
+	
+	if (value < redMin || value > redMax) {
+		bar.style.backgroundColor = 'red';
+		setAlertBar('red');
+		} else if (value < yellowMin || value > yellowMax) {
+		bar.style.backgroundColor = 'yellow';
+		setAlertBar('yellow');
+		} else {
+		bar.style.backgroundColor = 'green';
+		clearAlert();
+	}
+}
+
+// ***** Alert Bar Functions *****
+function setAlertBar(color) {
+	const alertBar = document.getElementById("eis-alert-bar");
+	if (alertBar) {
+		alertBar.style.backgroundColor = color;
+		alertBar.style.visibility = "visible";
+		startFlashingAlert();
+		} else {
+		console.error('Alert bar element not found.');
+	}
+}
+
+function startFlashingAlert() {
+	if (!alertFlashInterval) {
+		alertFlashInterval = setInterval(() => {
+			const efisSwitchBtn = document.getElementById("efis-switch-button");
+			const eisSwitchBtn = document.getElementById("eis-switch-button");
+			const alertBar = document.getElementById("eis-alert-bar");
+			if (efisSwitchBtn){
+				efisSwitchBtn.style.backgroundColor = (efisSwitchBtn.style.backgroundColor === "red") ? "yellow" : "red";
+			}
+			if (eisSwitchBtn){
+				eisSwitchBtn.style.borderColor = (eisSwitchBtn.style.borderColor === "red") ? "yellow" : "red";
+			}
+			if (alertBar) {
+				alertBar.style.visibility = (alertBar.style.visibility === "visible") ? "hidden" : "visible";
+			}
+		}, 500);
+	}
+}
+
+function clearAlert() {
+	const efisSwitchBtn = document.getElementById("efis-switch-button");
+	const eisSwitchBtn = document.getElementById("eis-switch-button");
+	const alertBar = document.getElementById("eis-alert-bar");
+	if (efisSwitchBtn){
+		efisSwitchBtn.style.backgroundColor = "yellow";
+	}
+	if (eisSwitchBtn){
+		eisSwitchBtn.style.borderColor = "yellow";
+	}
+	if (alertBar) {
+		alertBar.style.visibility = "hidden";
+		alertBar.style.backgroundColor = "black";
+	}
+	
+	clearInterval(alertFlashInterval);
+	alertFlashInterval = null;
+}
+
+// ***** Event Listeners for Input Changes *****
+
+document.addEventListener('change', (e) => {
+	if (e.target.id === 'apEngageToggle' || e.target.id === 'apAltitudeHoldToggle' || e.target.id === 'apWingLevelerToggle') {
+		const engage = document.getElementById('apEngageToggle').checked;
+		const altitudeHold = document.getElementById('apAltitudeHoldToggle').checked;
+		const wingLeveler = document.getElementById('apWingLevelerToggle').checked;
+		
+		const data = {
+			apEngage: engage,
+			apAltitudeHold: altitudeHold,
+			apWingLeveler: wingLeveler
+		};
+		
+		sendSettings(data);
+	}
+});
+
+
+
+// ***** Page Switching Function *****
+function switchPage(targetPageId) {
+	const pages = document.querySelectorAll('.page');
+	pages.forEach(page => {
+		page.style.display = 'none';
+		page.classList.remove('active');
+	});
+	
+	const targetPage = document.getElementById(targetPageId);
+	if (targetPage) {
+		requestAnimationFrame(() => {
+			targetPage.style.display = 'block';
+			targetPage.classList.add('active');
+		});
+		} else {
+		console.error(`Page with ID '${targetPageId}' not found.`);
+	}
+}
+
+
+// ***** Document Ready Initialization *****
+document.addEventListener('DOMContentLoaded', () => {
+	initializeWebSocket();
+});
+
+
+// ***** Primary Flight Display (PFD) Module *****
+const PFD = (function() {
+	const canvas = document.getElementById('horizon');
+	const ctx = canvas.getContext('2d');
+	
+	function resizeCanvas() {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+	}
+	window.addEventListener('resize', resizeCanvas);
+	resizeCanvas();
+	
+	let currentPitch = 0;
+	let currentRoll = 0;
+	let startPitch = 0;
+	let startRoll = 0;
+	let targetPitch = 0;
+	let targetRoll = 0;
+	let startTime = performance.now();
+	const duration = 50; // Animation duration in ms
+	
+	function drawHorizon(pitch, roll) {
+		const centerX = canvas.width / 2;
+		const centerY = canvas.height / 2;
+		
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
+		ctx.save();
+		
+		ctx.translate(centerX, centerY);
+		ctx.rotate(-roll * Math.PI / 180);
+		ctx.translate(0, pitch * canvas.height / 90);
+		
+		ctx.fillStyle = 'skyblue';
+		ctx.fillRect(-canvas.width * 2, -canvas.height * 2, canvas.width * 4, canvas.height * 2);
+		
+		ctx.fillStyle = 'saddlebrown';
+		ctx.fillRect(-canvas.width * 2, 0, canvas.width * 4, canvas.height * 2);
+		
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		ctx.moveTo(-canvas.width, 0);
+		ctx.lineTo(canvas.width, 0);
+		ctx.stroke();
+		
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 1;
+		for (let i = -90; i <= 90; i += 10) {
+			if (i === 0) continue;
+			const y = -i * canvas.height / 90;
+			ctx.beginPath();
+			ctx.moveTo(-30, y);
+			ctx.lineTo(30, y);
+			ctx.stroke();
+			
+			ctx.font = "16px Arial";
+			ctx.fillStyle = 'white';
+			ctx.textAlign = "center";
+			ctx.fillText(`${i}`, -40, y + 5);
+			ctx.fillText(`${i}`, 40, y + 5);
+		}
+		
+		ctx.restore();
+		
+		ctx.save();
+		ctx.translate(centerX, centerY - canvas.height * 0.05);
+		
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		ctx.arc(0, 0, canvas.height * 0.2, 1.2 * Math.PI, 1.8 * Math.PI);
+		ctx.stroke();
+		
+		for (let i = -60; i <= 60; i += 10) {
+			const angle = (i - roll) * Math.PI / 180;
+			const x1 = canvas.height * 0.18 * Math.sin(angle);
+			const y1 = -canvas.height * 0.18 * Math.cos(angle);
+			const x2 = canvas.height * 0.2 * Math.sin(angle);
+			const y2 = -canvas.height * 0.2 * Math.cos(angle);
+			ctx.beginPath();
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			ctx.stroke();
+			
+			if (i % 30 === 0 && i !== 0) {
+				ctx.font = "14px Arial";
+				ctx.fillStyle = 'white';
+				ctx.textAlign = "center";
+				ctx.fillText(`${i}`, x2 * 1.1, y2 * 1.1);
+			}
+		}
+		
+		ctx.fillStyle = 'yellow';
+		ctx.beginPath();
+		ctx.moveTo(0, -canvas.height * 0.22);
+		ctx.lineTo(-10, -canvas.height * 0.22 + 20);
+		ctx.lineTo(10, -canvas.height * 0.22 + 20);
+		ctx.closePath();
+		ctx.fill();
+		
+		ctx.restore();
+		
+		ctx.strokeStyle = 'yellow';
+		ctx.lineWidth = 3;
+		ctx.beginPath();
+		ctx.moveTo(centerX - 40, centerY);
+		ctx.lineTo(centerX + 40, centerY);
+		ctx.stroke();
+		
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY - 20);
+		ctx.lineTo(centerX, centerY);
+		ctx.stroke();
+	}
+	
+	function updatePitchAndRoll(newPitch, newRoll) {
+		startPitch = currentPitch;
+		startRoll = currentRoll;
+		targetPitch = newPitch;
+		targetRoll = newRoll;
+		startTime = performance.now();
+	}
+	
+	function easeInOutQuad(t) {
+		return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+	}
+	
+	function animate() {
+		const now = performance.now();
+		const elapsed = now - startTime;
+		let progress = elapsed / duration;
+		if (progress > 1) progress = 1;
+		
+		// Apply easing function
+		const easedProgress = easeInOutQuad(progress);
+		
+		currentPitch = startPitch + (targetPitch - startPitch) * easedProgress;
+		currentRoll = startRoll + (targetRoll - startRoll) * easedProgress;
+		
+		drawHorizon(currentPitch, currentRoll);
+		
+		requestAnimationFrame(animate);
+	}
+	
+	animate();
+	
+	return {
+		updatePitchAndRoll
+	};
+})();
+
+
+// ***** Heading Indicator Module *****
+const HeadingIndicator = (function() {
+	const instruments = {
+		heading: {
+			currentValue: 0,
+			bugValue: 0,
+			step: 10
+		}
+	};
+	
+	function populateHeadingTicker() {
+		const ticker = document.getElementById('headingTicker');
+		ticker.innerHTML = '';
+		const prependSteps = 4;
+		const appendSteps = 3;
+		const prependStart = (360 - (prependSteps * instruments.heading.step)) % 360;
+		
+		const getLabel = (value) => {
+			switch (value) {
+				case 0:
+				return 'N';
+				case 90:
+				return 'E';
+				case 180:
+				return 'S';
+				case 270:
+				return 'W';
+				default:
+				return value.toString();
+			}
+		};
+		
+		for (let i = prependStart; i < 360; i += instruments.heading.step) {
+			const div = document.createElement('div');
+			div.textContent = getLabel(i);
+			ticker.appendChild(div);
+		}
+		
+		for (let i = 0; i <= 350; i += instruments.heading.step) {
+			const div = document.createElement('div');
+			div.textContent = getLabel(i);
+			ticker.appendChild(div);
+		}
+		
+		for (let i = 0; i <= (appendSteps * instruments.heading.step); i += instruments.heading.step) {
+			const div = document.createElement('div');
+			div.textContent = getLabel(i);
+			ticker.appendChild(div);
+		}
+	}
+	
+	function updateHeadingTickerAndBug() {
+		const currentValue = instruments.heading.currentValue;
+		const bugValue = instruments.heading.bugValue;
+		const ticker = document.getElementById('headingTicker');
+		const container = document.getElementById('heading');
+		const containerWidth = container.clientWidth;
+		
+		const pixelsPerDegree = containerWidth / (80 * instruments.heading.step / 10);
+		const totalSteps = ticker.children.length;
+		const currentDivIndex = Math.floor(currentValue / instruments.heading.step) + 4;
+		const remainder = currentValue % instruments.heading.step;
+		
+		const baseDivOffsetLeft = ticker.children[currentDivIndex]?.offsetLeft || 0;
+		const divWidth = ticker.children[currentDivIndex]?.offsetWidth || 0;
+		const fractionalOffset = remainder * (divWidth / instruments.heading.step);
+		const divCenter = baseDivOffsetLeft + fractionalOffset + (divWidth / 2);
+		
+		const translateX = (containerWidth / 2) - divCenter;
+		
+		ticker.style.transition = (currentValue === 0 || currentValue === 359) ? 'none' : 'transform 0.6s ease';
+		ticker.style.transform = `translateX(${translateX}px)`;
+		
+		const headingValueBox = document.getElementById('headingValueBox');
+		if (headingValueBox) {
+			headingValueBox.textContent = currentValue;
+			} else {
+			console.error('Element with ID "headingValueBox" not found.');
+		}
+		
+		const headingTargetBox = document.getElementById('headingTargetBox');
+		if (headingTargetBox) {
+			headingTargetBox.textContent = bugValue;
+			} else {
+			console.error('Element with ID "headingTargetBox" not found.');
+		}
+		
+		updateBugTriangle();
+	}
+	
+	function updateBugTriangle() {
+		const bugValue = instruments.heading.bugValue;
+		const currentValue = instruments.heading.currentValue;
+		let difference = (bugValue - currentValue + 360) % 360;
+		if (difference > 180) {
+			difference -= 360;
+		}
+		const container = document.getElementById('heading');
+		const containerWidth = container.clientWidth;
+		const pixelsPerDegree = containerWidth / 80;
+		let newLeft = (containerWidth / 2) + (difference * pixelsPerDegree);
+		const bugTriangle = document.getElementById('bugTriangle');
+		const minLeft = 10;
+		const maxLeft = containerWidth - 10;
+		newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
+		if (bugTriangle) {
+			bugTriangle.style.left = `${newLeft}px`;
+			} else {
+			console.error('Element with ID "bugTriangle" not found.');
+		}
+	}
+	
+	function openSettings() {
+		const modal = document.getElementById('headingSettingsModal');
+		if (!modal) {
+			console.error('Heading Settings Modal not found.');
+			return;
+		}
+		document.getElementById('headingBugInput').value = instruments.heading.bugValue;
+		modal.style.display = 'flex';
+	}
+	
+	function saveSettings() {
+		const headingBugInput = document.getElementById('headingBugInput').value;
+		let newHeadingBug = parseInt(headingBugInput, 10);
+		if (isNaN(newHeadingBug) || newHeadingBug < 0 || newHeadingBug > 359) {
+			alert("Please enter a valid Heading Bug value between 0 and 359.");
+			return;
+		}
+		
+		instruments.heading.bugValue = newHeadingBug;
+		updateHeadingTickerAndBug();
+		
+		// Prepare data to send
+		const data = {
+			headingBug: newHeadingBug
+		};
+		sendSettings(data);
+		
+		// Close the settings modal
+		closeSettings();
+	}
+	
+	function closeSettings() {
+		const modal = document.getElementById('headingSettingsModal');
+		if (modal) {
+			modal.style.display = 'none';
+			} else {
+			console.error('Heading Settings Modal not found.');
+		}
+	}
+	
+	function updateHeading(value) {
+		instruments.heading.currentValue = ((value % 360) + 360) % 360;
+		updateHeadingTickerAndBug();
+	}
+	
+	function updateSettings(newSettings) {
+		if (newSettings.efis && newSettings.efis.headingBug !== undefined) {
+			instruments.heading.bugValue = newSettings.efis.headingBug;
+			updateHeadingTickerAndBug();
+		}
+	}
+	
+	populateHeadingTicker();
+	updateHeadingTickerAndBug();
+	
+	return {
+		openSettings,
+		closeSettings,
+		saveSettings,
+		updateHeading,
+		updateSettings
+	};
+})();
+
+
+// ***** AoA Indicator Module *****
+const AoAIndicator = (function () {
+	const elements = Array.from(document.querySelectorAll('#aoaGaugeContainer .aoa-segment, #aoaGaugeContainer .aoa-center-circle')).reverse();
+	let currentAoA = 1;
+	let stallValue = 12; // Default stall value
+	
+	function updateAoA(value) {
+		const clampedAoA = Math.max(-stallValue, Math.min(stallValue, value)); // Clamp AoA to the range
+		
+		elements.forEach(el => (el.style.opacity = 0)); // Reset all segments
+		const segmentsToLight = Math.abs(Math.round((clampedAoA / stallValue) * elements.length)); // Scale AoA
+		
+		for (let i = 0; i < segmentsToLight; i++) {
+			elements[i].style.opacity = 1;
+		}
+	}
+	
+	function openSettings() {
+		const modal = document.getElementById('aoaSettingsModal');
+		if (!modal) {
+			console.error('AoA Settings Modal not found.');
+			return;
+		}
+		document.getElementById('aoaStallValueInput').value = stallValue;
+		modal.style.display = 'flex';
+	}
+	
+	function saveSettings() {
+		const aoaStallValueInput = document.getElementById('aoaStallValueInput').value;
+		let newStallValue = parseFloat(aoaStallValueInput);
+		if (isNaN(newStallValue) || newStallValue < 0 || newStallValue > 20) { // Assuming 20 is the maximum allowed stall value
+			alert("Please enter a valid AoA Stall value between 0 and 20.");
+			return;
+		}
+		
+		stallValue = newStallValue;
+		updateAoA(currentAoA);
+		
+		// Prepare data to send
+		const data = {
+			aoaStallVal: stallValue
+		};
+		sendSettings(data);
+		
+		// Close the settings modal
+		closeSettings();
+	}
+	
+	function closeSettings() {
+		const modal = document.getElementById('aoaSettingsModal');
+		if (modal) {
+			modal.style.display = 'none';
+			} else {
+			console.error('AoA Settings Modal not found.');
+		}
+	}
+	
+	function updateSettings(newSettings) {
+		if (newSettings.efis && newSettings.efis.aoaStallVal !== undefined) {
+			stallValue = newSettings.efis.aoaStallVal;
+			updateAoA(currentAoA);
+		}
+	}
+	
+	return {
+		updateAoA,
+		openSettings,
+		saveSettings,
+		closeSettings,
+		updateSettings,
+	};
+})();
+
+
+// ***** Airspeed Indicator Module *****
+const AirspeedIndicator = (function() {
+	const marquee = document.getElementById('airspeedMarquee');
+	const centerValueBox = document.getElementById('airspeedCenterValueBox');
+	const settingsModal = document.getElementById('airspeedSettingsModal');
+	const tickerContainer = document.getElementById('airspeedTickerContainer');
+	const groundSpeedLine = document.getElementById('groundSpeedLine');
+	
+	let minValue = 0; // Static min value
+	let maxValue = 150;
+	let step = 10;
+	
+	let yellowMin = 10;
+	let yellowMax = 100;
+	let redMin = 5;
+	let redMax = 120;
+	
+	let airspeed = 0;
+	let airspeedBug = 70; // Default airspeed bug
+	
+	let groundspeed = 0;
+	
+	function populateTicker() {
+		marquee.innerHTML = '';
+		for (let i = maxValue; i >= minValue; i -= step) {
+			const span = document.createElement('span');
+			span.textContent = i;
+			marquee.appendChild(span);
+		}
+		if ((maxValue - minValue) % step !== 0) {
+			const span = document.createElement('span');
+			span.textContent = minValue;
+			marquee.appendChild(span);
+		}
+	}
+	
+	function calculateOffset(value) {
+		const elementHeight = marquee.children[1]
+		? marquee.children[1].offsetTop - marquee.children[0].offsetTop
+		: marquee.children[0].offsetHeight;
+		
+		const totalValueRange = maxValue - minValue;
+		const totalHeight = (marquee.children.length - 1) * elementHeight;
+		
+		const offset = ((maxValue - value) / totalValueRange) * totalHeight;
+		
+		return offset;
+	}
+	
+	function updateTargetTriangle(targetValue, setValue) {
+		if (isNaN(targetValue) || isNaN(setValue)) {
+			console.warn("Invalid target or set value.");
+			return;
+		}
+		
+		const clampedTarget = Math.max(minValue, Math.min(maxValue, targetValue));
+		const clampedSet = Math.max(minValue, Math.min(maxValue, setValue));
+		
+		const offsetSetValue = calculateOffset(clampedSet);
+		const offsetTargetValue = calculateOffset(clampedTarget);
+		
+		// Reverse the deltaOffset calculation
+		const deltaOffset = offsetTargetValue - offsetSetValue;
+		
+		const containerHeight = marquee.parentElement.clientHeight;
+		const customOffset = 9; // Adjust this value as needed
+		const elementHeight = marquee.children[1]
+		? marquee.children[1].offsetTop - marquee.children[0].offsetTop
+		: marquee.children[0].offsetHeight;
+		
+		const trianglePosition = (containerHeight / 2 - elementHeight / 2 + customOffset) + deltaOffset;
+		
+		const targetTriangle = document.getElementById('targetValueIndicator');
+		if (targetTriangle) {
+			// Clamp trianglePosition within the ticker container
+			const minTop = 0;
+			const maxTop = containerHeight - elementHeight;
+			const clampedPosition = Math.max(minTop, Math.min(trianglePosition, maxTop));
+			targetTriangle.style.top = `${clampedPosition}px`;
+			} else {
+			console.error('Element with ID "targetValueIndicator" not found.');
+		}
+	}
+	
+	function updateTicker(value, gsVal) {
+		const setValue = parseFloat(value);
+		const targetValue = airspeedBug; // Use the saved airspeed bug
+		const gsValue = gsVal;
+		
+		if (isNaN(setValue)) {
+			console.warn(`Invalid airspeed value received: ${value}`);
+			return;
+		}
+		
+		centerValueBox.textContent = Math.round(setValue);
+		const targetValueBox = document.getElementById('targetValueBox');
+		if (targetValueBox) {
+			targetValueBox.textContent = Math.round(targetValue); // Update target value box
+			} else {
+			console.error('Element with ID "targetValueBox" not found.');
+		}
+		
+		const clampedValue = Math.max(minValue, Math.min(maxValue, setValue));
+		
+		const elementHeight = marquee.children[1]
+		? marquee.children[1].offsetTop - marquee.children[0].offsetTop
+		: marquee.children[0].offsetHeight;
+		
+		const totalValueRange = maxValue - minValue;
+		const totalHeight = (marquee.children.length - 1) * elementHeight;
+		
+		const offset = ((maxValue - clampedValue) / totalValueRange) * totalHeight;
+		
+		const containerHeight = marquee.parentElement.clientHeight;
+		
+		const customOffset = 9;
+		
+		const topPosition = (containerHeight / 2 - offset - elementHeight / 2 + customOffset);
+		
+		marquee.style.top = `${topPosition}px`;
+		
+		updateBackgroundColor(setValue);
+		
+		updateTargetTriangle(targetValue, setValue); // Pass both target and set values
+		
+		updateGroundSpeedLine(gsValue, setValue);
+	}
+	
+	function updateGroundSpeedLine(gsValue, setValue) {
+		if (isNaN(gsValue) || isNaN(setValue)) {
+			console.warn("Invalid ground speed or airspeed value.");
+			return;
+		}
+		
+		const clampedGroundSpeed = Math.max(minValue, Math.min(maxValue, gsValue));
+		const clampedSet = Math.max(minValue, Math.min(maxValue, setValue));
+		
+		const offsetSetValue = calculateOffset(clampedSet);
+		const offsetTargetValue = calculateOffset(clampedGroundSpeed);
+		
+		// Reverse the deltaOffset calculation
+		const deltaOffset = offsetTargetValue - offsetSetValue;
+		
+		const containerHeight = marquee.parentElement.clientHeight;
+		const customOffset = 20; // Adjust this value as needed
+		const elementHeight = marquee.children[1]
+		? marquee.children[1].offsetTop - marquee.children[0].offsetTop
+		: marquee.children[0].offsetHeight;
+		
+		const groundSpeedPosition = (containerHeight / 2 - elementHeight / 2 + customOffset) + deltaOffset;
+		
+		// Clamp groundSpeedPosition within the ticker container
+		const minTop = 0;
+		const maxTop = containerHeight - elementHeight;
+		const clampedPosition = Math.max(minTop, Math.min(groundSpeedPosition, maxTop));
+		//console.log(`Ground Speed Line Position: ${clampedPosition}px`);
+		
+		if (groundSpeedLine) {
+			if (clampedPosition > 150){
+				groundSpeedLine.style.top = `150px`;
+				groundSpeedLine.style.bottom = `${300 - clampedPosition}px`;
+				} else {
+				groundSpeedLine.style.top = `${clampedPosition}px`;
+				groundSpeedLine.style.bottom = `150px`;
+			}
+			} else {
+			console.error('Element with ID "groundSpeedLine" not found.');
+		}
+	}
+	
+	function updateBackgroundColor(value) {
+		let bgColor = 'rgba(0, 0, 0, 0.6)';
+		
+		if ((value < yellowMin && value <= redMin) || (value > yellowMax && value >= redMax)) {
+			bgColor = 'rgba(255, 0, 0, 0.3)';
+		}
+		else if ((value < yellowMin && value > redMin) || (value > yellowMax && value < redMax)) {
+			bgColor = 'rgba(255, 255, 0, 0.3)';
+		}
+		
+		tickerContainer.style.backgroundColor = bgColor;
+	}
+	
+	function openSettings() {
+		if (!settingsModal) {
+			console.error('Airspeed Settings Modal not found.');
+			return;
+		}
+		document.getElementById('airspeedMaxValueInput').value = maxValue;
+		document.getElementById('airspeedYellowMinInput').value = yellowMin;
+		document.getElementById('airspeedYellowMaxInput').value = yellowMax;
+		document.getElementById('airspeedRedMinInput').value = redMin;
+		document.getElementById('airspeedRedMaxInput').value = redMax;
+		// Populate airspeed bug from settings or default
+		document.getElementById('targetValueInput').value = settings.efis.airspeedBug !== undefined ? settings.efis.airspeedBug : airspeedBug;
+		settingsModal.style.display = 'flex';
+	}
+	
+	function saveSettings() {
+		const airspeedBugInput = document.getElementById('targetValueInput').value;
+		const airspeedMaxValueInput = document.getElementById('airspeedMaxValueInput').value;
+		const airspeedYellowMinInput = document.getElementById('airspeedYellowMinInput').value;
+		const airspeedYellowMaxInput = document.getElementById('airspeedYellowMaxInput').value;
+		const airspeedRedMinInput = document.getElementById('airspeedRedMinInput').value;
+		const airspeedRedMaxInput = document.getElementById('airspeedRedMaxInput').value;
+		
+		let newAirspeedBug = parseFloat(airspeedBugInput);
+		let newAirspeedMax = parseFloat(airspeedMaxValueInput);
+		let newYellowMin = parseFloat(airspeedYellowMinInput);
+		let newYellowMax = parseFloat(airspeedYellowMaxInput);
+		let newRedMin = parseFloat(airspeedRedMinInput);
+		let newRedMax = parseFloat(airspeedRedMaxInput);
+		
+		if (isNaN(newAirspeedBug) || isNaN(newAirspeedMax) || isNaN(newYellowMin) ||
+			isNaN(newYellowMax) || isNaN(newRedMin) || isNaN(newRedMax)) {
+			alert("Please enter valid numerical values.");
+			console.error("Invalid input values. Save aborted.");
+			return;
+		}
+		
+		airspeedBug = newAirspeedBug;
+		maxValue = newAirspeedMax;
+		yellowMin = newYellowMin;
+		yellowMax = newYellowMax;
+		redMin = newRedMin;
+		redMax = newRedMax;
+		
+		populateTicker();
+		updateTicker(airspeed, groundspeed);
+		
+		// Prepare data to send
+		const data = {
+			airspeedBug: airspeedBug,
+			airspeedMax: maxValue,
+			airspeedYellowMin: yellowMin,
+			airspeedYellowMax: yellowMax,
+			airspeedRedMin: redMin,
+			airspeedRedMax: redMax
+		};
+		sendSettings(data);
+		
+		// Close modal
+		closeSettings();
+	}
+	
+	function closeSettings() {
+		if (settingsModal) {
+			settingsModal.style.display = 'none';
+			} else {
+			console.error('Airspeed Settings Modal not found.');
+		}
+	}
+	
+	function updateAirspeed(value, gs) {
+		airspeed = value;
+		groundspeed = gs;
+		updateTicker(value, gs);
+	}
+	
+	function updateSettings(newSettings) {
+		if (newSettings.efis) {
+			if (newSettings.efis.airspeedMax !== undefined) {
+				maxValue = newSettings.efis.airspeedMax;
+			}
+			if (newSettings.efis.airspeedYellowMin !== undefined) {
+				yellowMin = newSettings.efis.airspeedYellowMin;
+			}
+			if (newSettings.efis.airspeedYellowMax !== undefined) {
+				yellowMax = newSettings.efis.airspeedYellowMax;
+			}
+			if (newSettings.efis.airspeedRedMin !== undefined) {
+				redMin = newSettings.efis.airspeedRedMin;
+			}
+			if (newSettings.efis.airspeedRedMax !== undefined) {
+				redMax = newSettings.efis.airspeedRedMax;
+			}
+			if (newSettings.efis.airspeedBug !== undefined) {
+				airspeedBug = newSettings.efis.airspeedBug;
+			}
+		}
+		populateTicker();
+		updateTicker(airspeed, groundspeed);
+	}
+	
+	// ***** Initialize Airspeed Indicator *****
+	populateTicker();
+	
+	return {
+		openSettings,
+		closeSettings,
+		saveSettings,
+		updateAirspeed,
+		updateSettings
+	};
+})();
+
+// ***** Altimeter Module *****
+const Altimeter = (function() {
+	const altitudeInstrument = {
+		minValue: 0, // Static min value
+		maxValue: 150000, // Static max value
+		step: 100,
+		currentValue: 0,
+	};
+	
+	let altitudeBug = 0; // Initialize altitude bug
+	let altimeterSetting = 29.92; // Default Altimeter Setting in inHg
+	
+	function populateAltitudeTicker() {
+		const ticker = document.getElementById('altitudeTicker');
+		ticker.innerHTML = '';
+		for (let i = altitudeInstrument.maxValue; i >= altitudeInstrument.minValue; i -= altitudeInstrument.step) {
+			const span = document.createElement('span');
+			span.textContent = i;
+			ticker.appendChild(span);
+		}
+	}
+	
+	function calculateOffset(value) {
+		const ticker = document.getElementById('altitudeTicker');
+		const elementHeight = ticker.children[1]
+		? ticker.children[1].offsetTop - ticker.children[0].offsetTop
+		: ticker.children[0].offsetHeight;
+		
+		const totalValueRange = altitudeInstrument.maxValue - altitudeInstrument.minValue;
+		const totalHeight = (ticker.children.length - 1) * elementHeight;
+		
+		const offset = ((altitudeInstrument.maxValue - value) / totalValueRange) * totalHeight;
+		
+		return offset;
+	}
+	
+	function updateTargetTriangle(targetValue, setValue) {
+		if (isNaN(targetValue) || isNaN(setValue)) {
+			console.warn("Invalid target or set value.");
+			return;
+		}
+		
+		const clampedTarget = Math.max(altitudeInstrument.minValue, Math.min(altitudeInstrument.maxValue, targetValue));
+		const clampedSet = Math.max(altitudeInstrument.minValue, Math.min(altitudeInstrument.maxValue, setValue));
+		
+		const offsetSetValue = calculateOffset(clampedSet);
+		const offsetTargetValue = calculateOffset(clampedTarget);
+		
+		// Reverse the deltaOffset calculation
+		const deltaOffset = offsetTargetValue - offsetSetValue;
+		
+		const ticker = document.getElementById('altitudeTicker');
+		const containerHeight = ticker.parentElement.clientHeight;
+		const customOffset = 9; // Adjust this value as needed
+		const elementHeight = ticker.children[1]
+		? ticker.children[1].offsetTop - ticker.children[0].offsetTop
+		: ticker.children[0].offsetHeight;
+		
+		const trianglePosition = (containerHeight / 2 - elementHeight / 2 + customOffset) + deltaOffset;
+		
+		const targetTriangle = document.getElementById('altitudeTargetValueIndicator');
+		if (targetTriangle) {
+			// Clamp trianglePosition within the ticker container
+			const minTop = 0;
+			const maxTop = containerHeight - elementHeight;
+			const clampedPosition = Math.max(minTop, Math.min(trianglePosition, maxTop));
+			targetTriangle.style.top = `${clampedPosition}px`;
+			} else {
+			console.error('Element with ID "altitudeTargetValueIndicator" not found.');
+		}
+	}
+	
+	function updateAltitudeTicker() {
+		const ticker = document.getElementById('altitudeTicker');
+		const value = altitudeInstrument.currentValue;
+		
+		// Clamp the current value to stay within the range
+		const clampedValue = Math.max(altitudeInstrument.minValue, Math.min(altitudeInstrument.maxValue, value));
+		
+		// Calculate the element height
+		const elementHeight = ticker.children[1]
+		? ticker.children[1].offsetTop - ticker.children[0].offsetTop
+		: ticker.children[0].offsetHeight;
+		
+		// Total height of all ticker elements
+		const totalHeight = (ticker.children.length - 1) * elementHeight;
+		
+		// Total altitude range
+		const totalValueRange = altitudeInstrument.maxValue - altitudeInstrument.minValue;
+		
+		// Calculate offset: proportional to the clamped value's position in the range
+		const offset = ((altitudeInstrument.maxValue - clampedValue) / totalValueRange) * totalHeight;
+		
+		// Center alignment: ensures the current value is in the middle of the ticker container
+		const containerHeight = ticker.parentElement.clientHeight;
+		const centerOffset = containerHeight / 2 - elementHeight / 2;
+		
+		// Final top position
+		const topPosition = centerOffset - offset;
+		
+		// Apply the calculated position
+		ticker.style.top = `${topPosition}px`;
+		
+		// Update the altitude value box
+		const altitudeValueBox = document.getElementById('altitudeValueBox');
+		if (altitudeValueBox) {
+			altitudeValueBox.textContent = clampedValue;
+			} else {
+			console.error('Element with ID "altitudeValueBox" not found.');
+		}
+		
+		// Update altitude bug indicator
+		updateTargetTriangle(altitudeBug, clampedValue);
+		
+		const altitudeTargetValueBox = document.getElementById('altitudeTargetValueBox');
+		if (altitudeTargetValueBox) {
+			altitudeTargetValueBox.textContent = Math.round(altitudeBug);
+			} else {
+			console.error('Element with ID "altitudeTargetValueBox" not found.');
+		}
+		
+		// Update Altimeter Setting Display
+		const altitudeSettingBox = document.getElementById('altitudeSettingBox');
+		if (altitudeSettingBox) {
+			altitudeSettingBox.textContent = altimeterSetting.toFixed(2);
+			} else {
+			console.error('Element with ID "altitudeSettingBox" not found.');
+		}
+	}
+	
+	function openSettings() {
+		const modal = document.getElementById('altitudeSettingsModal');
+		if (!modal) {
+			console.error('Altitude Settings Modal not found.');
+			return;
+		}
+		document.getElementById('altitudeStepValue').value = altitudeInstrument.step;
+		// Populate altitude bug from settings or default
+		const altitudeBugInput = document.getElementById('altitudeBugInput');
+		if (altitudeBugInput) {
+			altitudeBugInput.value = settings.efis.altitudeBug !== undefined ? settings.efis.altitudeBug : altitudeBug;
+			} else {
+			console.error('Element with ID "altitudeBugInput" not found.');
+		}
+		// Populate altimeter setting from settings or default
+		const altimeterSettingInput = document.getElementById('altimeterSettingInput');
+		if (altimeterSettingInput) {
+			altimeterSettingInput.value = settings.efis.altimeterSetting !== undefined ? settings.efis.altimeterSetting : altimeterSetting;
+			} else {
+			console.error('Element with ID "altimeterSettingInput" not found.');
+		}
+		modal.style.display = 'flex';
+	}
+	
+	function saveSettings() {
+		const altimeterSettingInput = document.getElementById('altimeterSettingInput').value;
+		const altitudeStepValueInput = document.getElementById('altitudeStepValue').value;
+		const altitudeBugInput = document.getElementById('altitudeBugInput').value;
+		
+		// Parse the inputs
+		let newAltimeterSetting = parseFloat(altimeterSettingInput);
+		let newAltitudeStep = parseInt(altitudeStepValueInput, 10);
+		let newAltitudeBug = parseInt(altitudeBugInput, 10);
+		
+		// Validate Altimeter Setting
+		if (isNaN(newAltimeterSetting) || newAltimeterSetting < 25.00 || newAltimeterSetting > 35.00) {
+			alert("Please enter a valid Altimeter Setting between 25.00 and 35.00 inHg.");
+			console.error("Invalid Altimeter Setting value:", altimeterSettingInput);
+			return;
+		}
+		
+		// Validate Altitude Step Value
+		if (isNaN(newAltitudeStep) || newAltitudeStep <= 0) {
+			alert("Please enter a valid Altitude Step value greater than 0.");
+			console.error("Invalid Altitude Step value:", altitudeStepValueInput);
+			return;
+		}
+		
+		// Validate Altitude Bug
+		if (isNaN(newAltitudeBug) || newAltitudeBug < 0 || newAltitudeBug > 150000) {
+			alert("Please enter a valid Altitude Bug value between 0 and 150,000.");
+			console.error("Invalid Altitude Bug value:", altitudeBugInput);
+			return;
+		}
+		
+		// Update internal variables
+		altimeterSetting = newAltimeterSetting;
+		altitudeInstrument.step = newAltitudeStep;
+		altitudeBug = newAltitudeBug;
+		
+		console.log("Updated Altimeter Settings:", {
+			altimeterSetting,
+			altitudeStep: altitudeInstrument.step,
+			altitudeBug
+		});
+		
+		// Refresh the Altimeter ticker and indicators
+		populateAltitudeTicker();
+		updateAltitudeTicker();
+		
+		// Prepare data to send
+		const data = {
+			altitudeStep: altitudeInstrument.step,
+			altitudeBug: altitudeBug,
+			altimeterSetting: altimeterSetting
+		};
+		sendSettings(data);
+		
+		// Close modal
+		closeSettings();
+	}
+	
+	function closeSettings() {
+		const modal = document.getElementById('altitudeSettingsModal');
+		if (modal) {
+			modal.style.display = 'none';
+			} else {
+			console.error('Altitude Settings Modal not found.');
+		}
+	}
+	
+	function updateAltitude(value) {
+		altitudeInstrument.currentValue = value;
+		updateAltitudeTicker();
+	}
+	
+	function updateSettings(newSettings) {
+		if (newSettings.efis) {
+			if (newSettings.efis.altitudeStep !== undefined) {
+				altitudeInstrument.step = newSettings.efis.altitudeStep;
+			}
+			if (newSettings.efis.altitudeBug !== undefined) {
+				altitudeBug = newSettings.efis.altitudeBug;
+			}
+			if (newSettings.efis.altimeterSetting !== undefined) {
+				altimeterSetting = newSettings.efis.altimeterSetting;
+			}
+		}
+		populateAltitudeTicker();
+		updateAltitudeTicker();
+	}
+	
+	// ***** Initialize Altimeter *****
+	populateAltitudeTicker();
+	updateAltitudeTicker();
+	
+	return {
+		openSettings,
+		closeSettings,
+		saveSettings,
+		updateAltitude,
+		updateSettings
+	};
+})();
+
+// ***** VSI Indicator Module *****
+const VSIIndicator = (function() {
+	const vsiData = {
+		scaleValue: 2000,
+		segments: 4,
+		currentValue: 0,
+	};
+	
+	function populateVsiTicker() {
+		const ticker = document.getElementById('vsiTicker');
+		const { scaleValue, segments } = vsiData;
+		const step = scaleValue / segments;
+		ticker.innerHTML = '';
+		
+		for (let value = -scaleValue; value <= scaleValue; value += step) {
+			const span = document.createElement('span');
+			span.textContent = value;
+			span.classList.add('vsi-ticker-span');
+			ticker.appendChild(span);
+		}
+	}
+	
+	function updateVsi() {
+		const line = document.getElementById('vsiLine');
+		const { scaleValue, currentValue } = vsiData;
+		
+		const clampedValue = Math.max(-scaleValue, Math.min(scaleValue, currentValue));
+		
+		const percentage = ((clampedValue + scaleValue) / (2 * scaleValue)) * 102;
+		
+		if (line) {
+			line.style.top = `${100 - percentage}%`;
+			} else {
+			console.error('Element with ID "vsiLine" not found.');
+		}
+	}
+	
+	function openSettings() {
+		const modal = document.getElementById('vsiModal');
+		if (!modal) {
+			console.error('VSI Modal not found.');
+			return;
+		}
+		document.getElementById('vsiScaleInput').value = vsiData.scaleValue;
+		document.getElementById('vsiSegmentsInput').value = vsiData.segments;
+		modal.style.display = 'flex';
+	}
+	
+	function closeSettings() {
+		const modal = document.getElementById('vsiModal');
+		if (modal) {
+			modal.style.display = 'none';
+			} else {
+			console.error('VSI Modal not found.');
+		}
+	}
+	
+	function saveSettings() {
+		const scaleInput = document.getElementById('vsiScaleInput').value;
+		const segmentsInput = document.getElementById('vsiSegmentsInput').value;
+		
+		const newScaleValue = parseInt(scaleInput, 10);
+		const newSegments = parseInt(segmentsInput, 10);
+		
+		if (isNaN(newScaleValue) || newScaleValue <= 0) {
+			alert("Please enter a valid scale value greater than 0.");
+			return;
+		}
+		
+		if (isNaN(newSegments) || newSegments <= 0) {
+			alert("Please enter a valid number of segments greater than 0.");
+			return;
+		}
+		
+		vsiData.scaleValue = newScaleValue;
+		vsiData.segments = newSegments;
+		
+		populateVsiTicker();
+		updateVsi();
+		
+		// Prepare data to send
+		const data = {
+			vsiScaleVal: vsiData.scaleValue,
+			vsiSegments: vsiData.segments
+		};
+		sendSettings(data);
+		
+		// Close modal
+		closeSettings();
+	}
+	
+	function updateVSI(value) {
+		vsiData.currentValue = value;
+		updateVsi();
+	}
+	
+	function updateSettings(newSettings) {
+		if (newSettings.efis) {
+			if (newSettings.efis.vsiScaleVal !== undefined) {
+				vsiData.scaleValue = newSettings.efis.vsiScaleVal;
+			}
+			if (newSettings.efis.vsiSegments !== undefined) {
+				vsiData.segments = newSettings.efis.vsiSegments;
+			}
+		}
+		populateVsiTicker();
+		updateVsi();
+	}
+	
+	// ***** Initialize VSI *****
+	populateVsiTicker();
+	updateVsi();
+	
+	return {
+		openSettings,
+		closeSettings,
+		saveSettings,
+		updateVSI,
+		updateSettings
+	};
+})();
+
+// ***** Slip Indicator Module *****
+const SlipIndicator = (function() {
+	function setSlipValue(value) {
+		value = Math.max(-50, Math.min(50, value));
+		const percentage = 50 + value;
+		
+		const slipBall = document.getElementById('slipBall');
+		if (slipBall) {
+			slipBall.style.left = `${percentage}%`;
+			} else {
+			console.error('Element with ID "slipBall" not found.');
+		}
+	}
+	
+	return {
+		setSlipValue
+	};
+})();
+
+// ***** RPM Gauge Module *****
+const RPMGauge = (function() {
+	const progressBar = document.getElementById("progress-bar");
+	const digitalReadout = document.getElementById("digital-readout");
+	const gaugeContainer = document.getElementById("rpmGaugeContainer");
+	const modal = document.getElementById("rpmSettingsModal");
+	
+	const maxInput = document.getElementById("rpmMaxValue");
+	const yellowInput = document.getElementById("rpmYellowAlert");
+	const redInput = document.getElementById("rpmRedAlert");
+	
+	let minValue = 0; // Static min value
+	let maxValue = 6000;
+	let yellowAlert = 5300;
+	let redAlert = 5600;
+	
+	// Ensure progressBar is loaded before accessing its properties
+	if (progressBar) {
+		const totalArcLength = progressBar.getTotalLength();
+		progressBar.style.strokeDasharray = totalArcLength;
+		progressBar.style.strokeDashoffset = totalArcLength;
+		} else {
+		console.error('Progress bar element not found.');
+	}
+	
+	function updateGauge(value) {
+		if (!progressBar) return;
+		
+		value = Math.max(minValue, Math.min(maxValue, value));
+		
+		const range = maxValue - minValue;
+		const percentage = (value - minValue) / range;
+		const offset = progressBar.getTotalLength() * (1 - percentage);
+		
+		progressBar.style.strokeDashoffset = offset;
+		
+		// Change colors based on RPM value
+		if (value >= redAlert) {
+			progressBar.style.stroke = "red"; // Critical RPM
+			} else if (value >= yellowAlert) {
+			progressBar.style.stroke = "yellow"; // Warning RPM
+			} else {
+			progressBar.style.stroke = "green"; // Normal RPM
+		}
+		
+		if (digitalReadout) {
+			digitalReadout.textContent = value;
+		}
+	}
+	
+	function openSettings() {
+		if (!modal) {
+			console.error('RPM Settings Modal not found.');
+			return;
+		}
+		modal.style.display = "flex";
+		maxInput.value = maxValue;
+		yellowInput.value = yellowAlert;
+		redInput.value = redAlert;
+	}
+	
+	function closeSettings() {
+		if (modal) {
+			modal.style.display = "none";
+			} else {
+			console.error('RPM Settings Modal not found.');
+		}
+	}
+	
+	function saveSettings() {
+		const newMaxValue = parseInt(maxInput.value, 10);
+		const newYellowAlert = parseInt(yellowInput.value, 10);
+		const newRedAlert = parseInt(redInput.value, 10);
+		
+		if (isNaN(newMaxValue) || isNaN(newYellowAlert) || isNaN(newRedAlert)) {
+			alert("Please enter valid numbers for all fields.");
+			return;
+		}
+		
+		if (newYellowAlert <= minValue || newYellowAlert >= newRedAlert || newYellowAlert >= newMaxValue) {
+			alert("Yellow Alert value must be greater than min value and less than red alert and max value.");
+			return;
+		}
+		
+		if (newRedAlert <= newYellowAlert || newRedAlert >= newMaxValue) {
+			alert("Red Alert value must be greater than yellow alert value and less than max value.");
+			return;
+		}
+		
+		maxValue = newMaxValue;
+		yellowAlert = newYellowAlert;
+		redAlert = newRedAlert;
+		
+		// Update gauge
+		updateGauge(0); // Reset gauge to 0 after settings change
+		
+		// Prepare data to send
+		const data = {
+			rpmMax: maxValue,
+			rpmYellow: yellowAlert,
+			rpmRed: redAlert
+		};
+		sendSettings(data);
+		
+		// Close modal
+		closeSettings();
+	}
+	
+	function updateRPM(value) {
+		updateGauge(value);
+	}
+	
+	function updateSettings(newSettings) {
+		if (newSettings.efis) {
+			if (newSettings.efis.rpmMax !== undefined) {
+				maxValue = newSettings.efis.rpmMax;
+			}
+			if (newSettings.efis.rpmYellow !== undefined) {
+				yellowAlert = newSettings.efis.rpmYellow;
+			}
+			if (newSettings.efis.rpmRed !== undefined) {
+				redAlert = newSettings.efis.rpmRed;
+			}
+		}
+		updateGauge(0); // Reset gauge to 0 after settings change
+	}
+	
+	// ***** Initialize RPM Gauge *****
+	updateGauge(0);
+	
+	return {
+		openSettings,
+		closeSettings,
+		saveSettings,
+		updateRPM,
+		updateSettings
+	};
+})();
+
+// ***** EIS Gauge Configuration Modal Functions *****
+let currentGaugeIdForEIS = null;
+
+function openGaugeConfig(gaugeId) {
+	currentGaugeIdForEIS = gaugeId;
+	const config = gaugeConfigs[gaugeId] || settings.gaugeConfigs[gaugeId] || {};
+	const modalTitle = document.getElementById("eis-modal-title");
+	const sensorName = config.name || `Sensor ${gaugeId.match(/\d+/)[0]}`;
+	if (modalTitle) {
+		modalTitle.textContent = `${sensorName} Configuration`;
+		} else {
+		console.error('Element with ID "eis-modal-title" not found.');
+	}
+	
+	document.getElementById("eis-sensor-name").value = config.name || `Sensor ${gaugeId.match(/\d+/)[0]}`;
+	document.getElementById("eis-gauge-min").value = config.min || 0;
+	document.getElementById("eis-gauge-max").value = config.max || 100;
+	document.getElementById("eis-gauge-yellow-min").value = config.yellowMin || 20;
+	document.getElementById("eis-gauge-yellow-max").value = config.yellowMax || 80;
+	document.getElementById("eis-gauge-red-min").value = config.redMin || 10;
+	document.getElementById("eis-gauge-red-max").value = config.redMax || 90;
+	document.getElementById("eis-sensor-visible").checked = config.visible !== false;
+	const eisModal = document.getElementById("eis-modal");
+	if (eisModal) {
+		eisModal.style.display = "flex";
+		} else {
+		console.error('Element with ID "eis-modal" not found.');
+	}
+}
+
+function closeGaugeConfigModal() {
+	const eisModal = document.getElementById("eis-modal");
+	if (eisModal) {
+		eisModal.style.display = "none";
+		} else {
+		console.error('Element with ID "eis-modal" not found.');
+	}
+}
+
+function saveGaugeSettings() {
+	if (!currentGaugeIdForEIS) return;
+	
+	const config = gaugeConfigs[currentGaugeIdForEIS] || {};
+	config.name = document.getElementById("eis-sensor-name").value;
+	config.min = parseFloat(document.getElementById("eis-gauge-min").value);
+	config.max = parseFloat(document.getElementById("eis-gauge-max").value);
+	config.yellowMin = parseFloat(document.getElementById("eis-gauge-yellow-min").value);
+	config.yellowMax = parseFloat(document.getElementById("eis-gauge-yellow-max").value);
+	config.redMin = parseFloat(document.getElementById("eis-gauge-red-min").value);
+	config.redMax = parseFloat(document.getElementById("eis-gauge-red-max").value);
+	config.visible = document.getElementById("eis-sensor-visible").checked;
+	
+	gaugeConfigs[currentGaugeIdForEIS] = config;
+	settings.gaugeConfigs = gaugeConfigs;
+	
+	// Update the gauge label if visible
+	const gaugeElement = document.getElementById(`eis-${currentGaugeIdForEIS}`);
+	if (gaugeElement) {
+		if (config.visible) {
+			gaugeElement.style.display = "block";
+			const sensorNumber = currentGaugeIdForEIS.replace('sensor', '');
+			const sensorName = config.name || `Sensor ${sensorNumber}`;
+			const gaugeTitle = gaugeElement.querySelector(".eis-gauge-title");
+			if (gaugeTitle) {
+				gaugeTitle.innerHTML = `${sensorName} <span id="eis-${currentGaugeIdForEIS}-value">0</span>`;
+				} else {
+				console.error(`Element with class "eis-gauge-title" not found within #eis-${currentGaugeIdForEIS}.`);
+			}
+			} else {
+			gaugeElement.style.display = "none";
+		}
+		} else {
+		console.error(`Gauge element with ID "eis-${currentGaugeIdForEIS}" not found.`);
+	}
+	
+	// Prepare data to send
+	const data = {
+		[`${currentGaugeIdForEIS}Label`]: config.name,
+		[`${currentGaugeIdForEIS}MinConfig`]: config.min,
+		[`${currentGaugeIdForEIS}MaxConfig`]: config.max,
+		[`${currentGaugeIdForEIS}YellowMin`]: config.yellowMin,
+		[`${currentGaugeIdForEIS}YellowMax`]: config.yellowMax,
+		[`${currentGaugeIdForEIS}RedMin`]: config.redMin,
+		[`${currentGaugeIdForEIS}RedMax`]: config.redMax,
+		[`${currentGaugeIdForEIS}Visible`]: config.visible
+	};
+	
+	sendSettings(data);
+	
+	// Close modal
+	closeGaugeConfigModal();
+}
+
+// ***** General Settings Module *****
+const GeneralSettings = (function() {
+	function openSettings() {
+		const modal = document.getElementById('generalSettingsModal');
+		if (!modal) {
+			console.error('General Settings Modal not found.');
+			return;
+		}
+		document.getElementById('stratuxToggle').checked = settings.efis.stratux || false;
+		modal.style.display = 'flex';
+	}
+	
+	function closeSettings() {
+		const modal = document.getElementById('generalSettingsModal');
+		if (modal) {
+			modal.style.display = 'none';
+			} else {
+			console.error('General Settings Modal not found.');
+		}
+	}
+	
+	function cage() {
+		
+		const cageBtn = document.getElementById('cage');
+		if (cageBtn) {
+			//cageBtn.addEventListener('click', (e) => {
+				const cageCommand = { action: "cagePFD" }; // Define the message structure
+				sendSettings(cageCommand); // Send the message as JSON
+				console.log("Cage command sent:", cageCommand);
+			//});
+			} else {
+			console.error('Element with ID "cageBtn" not found.');
+		}
+		
+		closeSettings();
+	}
+	
+	// ***** Event Listener for Stratux Toggle *****
+	const stratuxToggle = document.getElementById('stratuxToggle');
+	if (stratuxToggle) {
+		stratuxToggle.addEventListener('change', (e) => {
+			const stratuxEnabled = e.target.checked;
+			const data = {
+				stratux: stratuxEnabled
+			};
+			sendSettings(data);
+		});
+		} else {
+		console.error('Element with ID "stratuxToggle" not found.');
+	}
+	
+	return {
+		openSettings,
+		closeSettings,
+		cage
+	};
+})();
+
+// ***** Autopilot Settings Module *****
+const AutopilotSettings = (function() {
+	
+	function openSettings() {
+		// Show Autopilot modal
+		const modal = document.getElementById('autopilotSettingsModal');
+		const apSettings = settings.autopilot || {};
+		document.getElementById('apEngageToggle').checked = apSettings.engage || false;
+		document.getElementById('apAltitudeHoldToggle').checked = apSettings.altitudeHold || false;
+		document.getElementById('apWingLevelerToggle').checked = apSettings.wingLeveler || false;
+		modal.style.display = 'flex';
+	}
+	
+	// Close Autopilot Settings Modal
+	function closeSettings() {
+		const modal = document.getElementById('autopilotSettingsModal');
+		modal.style.display = 'none';
+	}
+	
+	return {
+		openSettings,
+		closeSettings
+	};
+})();
+
+// ***** Trim Settings Module *****
+const Trim = (function() {
+	
+	function openSettings() {
+	
+		
+		// Show Trim modal
+		const modal = document.getElementById('trimSettingsModal');
+		
+		// **** Trim Settings Button Event Listeners ****
+		const pitchTrimSlider = document.getElementById('pitchTrimSlider');
+		const rollTrimSlider = document.getElementById('rollTrimSlider');
+		
+		const debouncedSendSettings = debounce(sendSettings, 200);
+		
+		// Event Listeners for Sliders
+		pitchTrimSlider.addEventListener('input', () => {
+			const value = mapRange(pitchTrimSlider.value, 0, 100, trimMin, trimMax);
+			//const value = mapRange(pitchTrimSlider.value, 0, 100, -30, 30);
+			const data = {
+				pitchTrim: Math.round(value)
+			};
+		
+			debouncedSendSettings(data);
+		});
+		
+		rollTrimSlider.addEventListener('input', () => {
+			const value = mapRange(rollTrimSlider.value, 0, 100, trimMin, trimMax);
+				//const value = mapRange(rollTrimSlider.value, 0, 100, -30, 30);
+			const data = {
+				rollTrim: Math.round(value)
+			};
+			debouncedSendSettings(data);
+		});
+		
+		// Debounce Function
+	    function debounce(func, delay) {
+		  let timer;
+		  return function (...args) {
+		    clearTimeout(timer);
+		    timer = setTimeout(() => func.apply(this, args), delay);
+		  };
+	    }
+		
+		// Utility Function to Map Slider Range to Actual Trim Values
+		function mapRange(value, inMin, inMax, outMin, outMax) {
+		return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+		}
+		modal.style.display = 'flex';
+	}
+	
+	// Close Trim Settings Modal
+	function closeSettings() {
+		const modal = document.getElementById('trimSettingsModal');
+		modal.style.display = 'none';
+	}
+	
+	return {
+		openSettings,
+		closeSettings
+	};
+})();
+
+
+// ***** Splash Screen Function *****
+function enterApp() {
+	const elem = document.documentElement;
+	if (elem.requestFullscreen) {
+		elem.requestFullscreen();
+		} else if (elem.webkitRequestFullscreen) { /* Safari */
+		elem.webkitRequestFullscreen();
+		} else if (elem.msRequestFullscreen) { /* IE11 */
+		elem.msRequestFullscreen();
+	}
+	const splashScreen = document.getElementById('splash-screen');
+	if (splashScreen) {
+		splashScreen.style.display = 'none';
+		} else {
+		console.error('Element with ID "splash-screen" not found.');
+	}
+}
+
+// ***** Attach Save Functions to Modals *****
+document.querySelector('.save-airspeed')?.addEventListener('click', AirspeedIndicator.saveSettings);
+document.querySelector('.save-heading')?.addEventListener('click', HeadingIndicator.saveSettings);
+document.querySelector('.save-aoa')?.addEventListener('click', AoAIndicator.saveSettings);
+document.querySelector('.save-altitude')?.addEventListener('click', Altimeter.saveSettings);
+document.querySelector('.save-vsi')?.addEventListener('click', VSIIndicator.saveSettings);
+document.querySelector('.save-rpm')?.addEventListener('click', RPMGauge.saveSettings);
+document.querySelector('.save-eis-gauge')?.addEventListener('click', saveGaugeSettings);
+document.querySelector('.close-general')?.addEventListener('click', GeneralSettings.closeSettings);
+document.querySelector('.close-autopilot')?.addEventListener('click', AutopilotSettings.closeSettings);
+document.querySelector('.cage')?.addEventListener('click', GeneralSettings.cage);
+document.querySelector('.close-trim')?.addEventListener('click', Trim.closeSettings);
+
+
+/*
+// ***** Page Switch Button Event Listeners *****
+const efisSwitchButton = document.getElementById('efis-switch-button');
+if (efisSwitchButton) {
+	efisSwitchButton.addEventListener('click', () => switchPage('eisPage'));
+	} else {
+	console.error('Element with ID "efis-switch-button" not found.');
+}
+
+const eisSwitchButton = document.getElementById('eis-switch-button');
+if (eisSwitchButton) {
+	eisSwitchButton.addEventListener('click', () => switchPage('efisPage'));
+	} else {
+	console.error('Element with ID "eis-switch-button" not found.');
+}
+*/
+
+/*
+// ***** EFIS Settings Button Event Listeners *****
+const efisApButton = document.getElementById('efis-ap-button');
+if (efisApButton) {
+	efisApButton.addEventListener('click', () => AutopilotSettings.openSettings());
+	} else {
+	console.error('Element with ID "efis-ap-button" not found.');
+}
+*/
+
+/*
+const efisGenSettingsButton = document.getElementById('efis-gensettings-button');
+if (efisGenSettingsButton) {
+	efisGenSettingsButton.addEventListener('click', () => GeneralSettings.openSettings());
+	} else {
+	console.error('Element with ID "efis-gensettings-button" not found.');
+}
+*/
+
+// ***** Restore Gauge Visibility Function (Assuming Double-Click on EIS Title) *****
+function restoreGaugeVisibility() {
+	// Iterate over all gauge configurations and make them visible
+	for (let sensorId in gaugeConfigs) {
+		if (gaugeConfigs.hasOwnProperty(sensorId)) {
+			gaugeConfigs[sensorId].visible = true; // Update the configuration
+			const gaugeElement = document.getElementById(`eis-${sensorId}`);
+			if (gaugeElement) {
+				gaugeElement.style.display = "block"; // Ensure the gauge is displayed
+			}
+		}
+	}
+	
+	// Optionally send updated visibility settings to the Arduino
+	const updatedVisibility = {};
+	for (let sensorId in gaugeConfigs) {
+		updatedVisibility[`${sensorId}Visible`] = true; // Prepare data to send
+	}
+	sendSettings(updatedVisibility);
+	
+	console.log("All gauges restored to visible.");
+}
+
+
+const eisPageTitle = document.getElementById('eis-page-title');
+if (eisPageTitle) {
+	eisPageTitle.addEventListener('dblclick', restoreGaugeVisibility);
+	} else {
+	console.error('Element with ID "eis-page-title" not found.');
+}
+</script>
+		
+		
+		
+		
+		</body>
+		</html>																					
