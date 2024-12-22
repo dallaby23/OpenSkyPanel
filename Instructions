@@ -1,0 +1,11 @@
+If you do not know much about Arduino and ESP32 then this project 'might' be a bit much but I will leave that to you.
+Download all the files with the 'data' directory to a location on your computer.
+Open the Rebel_EFIS_V4.ino file in the Arduino IDE.
+I will be adding all the required libraries here soon but for now if you know Arduino you can just look at the #includes to get them.
+I used 2MB APP and 2MB SPIFFS no OTA for the partition size. (the program will require larger than the default of 1.2MB)
+After uploading the main program to the ESP32 you will need to upload the webpages in the 'data' directory.
+The partition is using LittleFS so therefore you need to install the LittleFS Upload utility. I followed this link. https://randomnerdtutorials.com/arduino-ide-2-install-esp32-littlefs/ 
+Once that is installed you simply (close Serial monitor if open) hold Shift+Ctrl and press P. A menu will popup and you can search for 'Upload LittleFS to ESP32' once you select that the upload will happen automatically.
+After that completes you should be able to connect to the internal Wifi at Rebel_AP with no password. The default IP is 192.168.10.5.
+So connect to http://192.168.10.5 or optionally http://efis.local 
+I will be providing a tuturial video in the near future but if you are having trouble you can reach out to me directly.
