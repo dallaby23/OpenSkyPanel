@@ -1,3 +1,7 @@
+  Hey guys, check out my project. I hope you find this interesting and functional. If you use it please let me know. Obviously while this is a functional instrument it is ultimately for educational purposes and as backup to your main instruments. I have been using versions of the EIS portion of this for years in a few planes and have found the warning components very helpful and also cleanup of many gauges and wiring. 
+
+  This is completely opensource and free to use. If you want to team up and develop it further please let me know. I do have several plans for its future. I will also be providing video of inflight in the very near future, so stay tuned!! 
+
 EFIS Panel
 
 ![image](https://github.com/user-attachments/assets/29588057-1ae5-4e3e-bbde-44c65f2379d1)
