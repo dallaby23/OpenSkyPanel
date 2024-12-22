@@ -2,6 +2,9 @@
 
   This is completely opensource and free to use. If you want to team up and develop it further please let me know. I do have several plans for its future. I will also be providing video of inflight in the very near future, so stay tuned!! 
 
+  Please read all of this page then goto the Instructions page to see how to install. Good luck and happy flying !! 
+  
+
 EFIS Panel
 
 ![image](https://github.com/user-attachments/assets/29588057-1ae5-4e3e-bbde-44c65f2379d1)
