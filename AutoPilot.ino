@@ -92,8 +92,6 @@ void updateAutopilot(float currentPitch, float currentRoll) {
       servoElevatorOutputDeg = ((ap.trimTabElevatorAngle + 90.0) + vs.pitchTrim);
     }
 
-    Serial.println(servoAileronOutputDeg);
-
     pulseLen = map((uint16_t)servoAileronOutputDeg, 0, 180, vs.servoMin, vs.servoMax);
     servo.setPWM(8, 0, pulseLen);
 

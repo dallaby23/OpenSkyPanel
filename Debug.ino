@@ -3,6 +3,7 @@
 //*****************************************************************
 void debug() {
   if (millis() - vs.debugTimer >= vs.debugFreq) {
+    /*
     Serial.print("pitch: ");
     Serial.print(efis.pitch, 0);
     Serial.print(" , roll: ");
@@ -17,10 +18,12 @@ void debug() {
     Serial.print(eis.vVolt);
     Serial.print(" , Current: ");
     Serial.print(eis.vCurrent, 3);
+    */
     Serial.print(" , WTemp: ");
     Serial.print(eis.vWTemp);
     Serial.print(" , OPressure: ");
     Serial.print(eis.vOPressure, 2);
+    /*
     Serial.print(" , Airspeed: ");
     Serial.print(efis.airspeed, 4);
     Serial.print(" , AoA: ");
@@ -42,7 +45,14 @@ void debug() {
     Serial.print(" , aileronAngle: ");
     Serial.print(ap.trimTabAileronAngle);
     */
+
     
+    Serial.print(", aoaRaw: ");
+    Serial.print(efis.aoaRaw);
+    Serial.print(", airspeedRaw: ");
+    Serial.print(efis.airspeedRaw);
+    
+
     Serial.println("");
     vs.debugTimer = millis();
   }

@@ -29,20 +29,20 @@ void read_IMU() {
 }
 
 
-void read_flight(){
+void read_flight() {
 
   if (millis() - efis.sensorTimer >= efis.efisFreq) {
     //Get Airspeed
     efis.airspeedRaw = readChannel2(ADS1115_COMP_1_GND);
-    efis.airspeedSmooth = efis.airspeedSmooth * 0.9 + efis.airspeedRaw * 0.1;
-    efis.airspeed = mapfloat(efis.airspeedSmooth, 2.4000, 1.5000, 0.0000, 100.0000);
+    efis.airspeedSmooth = efis.airspeedSmooth * 0.2 + efis.airspeedRaw * 0.8;
+    efis.airspeed = mapfloat(efis.airspeedSmooth, 2.4000, 1.5000, 0.0000, 150.0000);
     if (efis.airspeed < 0) {
       efis.airspeed = 0;
     }
 
     //Get AoA
     efis.aoaRaw = readChannel2(ADS1115_COMP_2_GND);
-    efis.aoaSmooth = efis.aoaSmooth * 0.9 + efis.aoaRaw * 0.1;
+    efis.aoaSmooth = efis.aoaSmooth * 0.1 + efis.aoaRaw * 0.9;
     efis.aoa = mapfloat(efis.aoaSmooth, 2.5000, 1.5000, 0.000, 12.000);
     if (efis.aoa < 0) {
       efis.aoa = 0;
@@ -69,47 +69,54 @@ void read_flight(){
 
 void sendEFISData() {
 
-    if (stratuxData.sEnabled){
-      if (vs.scPitchRoll){
-        efis.pitch = stratuxData.sPitch;
-        efis.roll = stratuxData.sRoll;
-      }
-      if (vs.scHeading){
-        efis.heading = stratuxData.sHeading;
-      }
-      if (vs.scSlip){
-        efis.slip = stratuxData.sSlip;
-      }
-      efis.groundSpeed = stratuxData.sGroundspeed;
-      efis.gForce = stratuxData.sGForce;
+  if (stratuxData.sEnabled) {
+    if (vs.scPitchRoll) {
+      efis.pitch = stratuxData.sPitch;
+      efis.roll = stratuxData.sRoll;
     }
+    if (vs.scHeading) {
+      efis.heading = stratuxData.sHeading;
+    }
+    if (vs.scSlip) {
+      efis.slip = stratuxData.sSlip;
+    }
+    efis.groundSpeed = stratuxData.sGroundspeed;
+    efis.gForce = stratuxData.sGForce;
+  }
 
-    StaticJsonDocument<512> doc;
+  StaticJsonDocument<512> doc;
 
-    // Populate the JSON document with EIS variables
-    doc["pitch"] = int(efis.pitch);
-    doc["roll"] = int(efis.roll);
-    doc["slip"] = int(efis.slip);
-    doc["heading"] = int(efis.heading);
-    doc["aoa"] = int(efis.aoa);
-    doc["airspeed"] = int(efis.airspeed);
-    doc["groundSpeed"] = int(efis.groundSpeed);
-    doc["altitude"] = int(efis.altitude);
-    doc["verticalSpeed"] = int(efis.verticalSpeed);
-    // Add more variables as needed
+  // Populate the JSON document with EIS variables
+  doc["pitch"] = int(efis.pitch);
+  doc["roll"] = int(efis.roll);
+  doc["slip"] = int(efis.slip);
+  doc["heading"] = int(efis.heading);
+  doc["aoa"] = int(efis.aoa);
+  doc["airspeed"] = int(efis.airspeed);
+  doc["groundSpeed"] = int(efis.groundSpeed);
+  doc["altitude"] = int(efis.altitude);
+  doc["verticalSpeed"] = int(efis.verticalSpeed);
+  // Add more variables as needed
 
-    // Serialize JSON to a string
-    String jsonString;
-    serializeJson(doc, jsonString);
+  // Serialize JSON to a string
+  String jsonString;
+  serializeJson(doc, jsonString);
 
-    // Broadcast the JSON string to all connected clients
-    ws.textAll(jsonString);
+  // Broadcast the JSON string to all connected clients
+  ws.textAll(jsonString);
 }
 
 
 // Define your cagePFD function
 void cagePFD() {
-    Serial.println("Caging PFD...");
+  Serial.println("Caging PFD...");
+  if (!stratuxData.sEnabled) {
     vs.pitchCageOffset = filter.getPitch();
     vs.rollCageOffset = filter.getRoll();
+  } else {
+    HTTPClient http;
+    http.begin("http://192.168.10.1/cageAHRS");
+    int httpResponseCode = http.POST("");  // Empty request body
+    http.end();
+  }
 }

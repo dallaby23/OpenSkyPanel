@@ -27,6 +27,7 @@ uint32_t delayMsec = 10;
 //*****Setup IMU
 Adafruit_Sensor *accelerometer, *gyroscope, *magnetometer;
 Adafruit_NXPSensorFusion filter;
+//Adafruit_Madgwick filter;
 Adafruit_LIS3MDL lis3mdl;
 Adafruit_LSM6DSL lsm6ds;
 
@@ -398,7 +399,6 @@ void setup(void) {
   servo.setOscillatorFrequency(27000000);
   servo.setPWMFreq(vs.servoFreq);
 
-
   //Setup WiFi
   const unsigned long wifiTimeout = 5000;
   unsigned long wifiStartTime = millis();
@@ -416,8 +416,11 @@ void setup(void) {
     Serial.println(WiFi.localIP());
   } else {
     Serial.println("\nCould not connect to WiFi. Setting up Access Point...");
+    WiFi.mode(WIFI_AP);
+    WiFi.useStaticBuffers(true);
     WiFi.softAPConfig(staticIP, gateway, subnet);
-    WiFi.softAP("Rebel_AP");
+    WiFi.softAP("Rebel_AP", "rebel", 6, false, 1);
+    WiFi.setSleep(false);
     Serial.print("Access Point IP address: ");
     Serial.println(WiFi.softAPIP());
   }
@@ -428,6 +431,7 @@ void setup(void) {
   }
   Serial.println("mDNS started. You can now reach the device at http://efis.local/");
   MDNS.addService("http", "tcp", 80);
+
 
   //Setup WebSocket
   ws.onEvent(onWebSocketEvent);
@@ -471,7 +475,7 @@ void loop(void) {
   updateAutopilot(efis.pitch, efis.roll);
 
   //Debug
-  debug();
+  //debug();
 }
 
 //*****************************************************************
@@ -493,5 +497,4 @@ void loopN(void) {
   } else {
     read_IMU();
   }
-  
 }
